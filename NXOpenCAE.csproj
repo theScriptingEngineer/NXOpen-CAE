@@ -1,0 +1,40 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>library</OutputType>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <Nullable>enable</Nullable>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Reference Include="NXOpen">
+      <HintPath>..\dlls\NXOpen.dll</HintPath>
+    </Reference>
+    <Reference Include="NXOpen.Utilities">
+      <HintPath>..\dlls\NXOpen.Utilities.dll</HintPath>
+    </Reference>
+    <Reference Include="NXOpen.UF">
+      <HintPath>..\dlls\NXOpen.UF.dll</HintPath>
+    </Reference>
+    <Reference Include="NXOpenUI">
+      <HintPath>..\dlls\NXOpenUI.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  
+<!--   <ItemGroup>
+    <Reference Include="NXOpen">
+      <HintPath>C:\Program Files\Siemens\Simcenter3D_2022.1\NXBIN\managed\nxopen.dll</HintPath>
+    </Reference>
+    <Reference Include="NXOpen.Utilities">
+      <HintPath>C:\Program Files\Siemens\Simcenter3D_2022.1\NXBIN\managed\nxopen.utilities.dll</HintPath>
+    </Reference>
+    <Reference Include="NXOpen.UF">
+      <HintPath>C:\Program Files\Siemens\Simcenter3D_2022.1\NXBIN\managed\nxopen.UF.dll</HintPath>
+    </Reference>
+    <Reference Include="NXOpenUI">
+      <HintPath>C:\Program Files\Siemens\Simcenter3D_2022.1\NXBIN\managed\nxopenUI.dll</HintPath>
+    </Reference>
+  </ItemGroup> -->
+
+</Project>
