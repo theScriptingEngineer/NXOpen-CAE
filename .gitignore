@@ -1,3 +1,9 @@
+# Visual Studio Code cache/options directory
+.vscode/
+
+# No SimCenter dll's because of copyright
 NXOpen*.dll
-bin
-obj
+
+# Build results
+[Bb]in/
+[Oo]bj/
