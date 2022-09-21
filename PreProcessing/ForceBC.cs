@@ -67,7 +67,18 @@
             basePart.Save(BasePart.SaveComponents.True, BasePart.CloseAfterSave.True);
         }
 
-        
+        /// <summary>
+        /// Create a constraint on a single node with givel label, using the given settings and name.
+        /// </summary>
+        /// <param name="nodeLabel">The array of ResultType used in the envelope</param>
+        /// <param name="dx">Imposed displacement in global X direction for the constraint. 0: fixed, -777777: free.</param>
+        /// <param name="dy">Imposed displacement in global Y direction for the constraint. 0: fixed, -777777: free.</param>
+        /// <param name="dz">Imposed displacement in global Z direction for the constraint. 0: fixed, -777777: free.</param>
+        /// <param name="rx">Imposed rotation in global X direction for the constraint. 0: fixed, -777777: free.</param>
+        /// <param name="ry">Imposed rotation in global Y direction for the constraint. 0: fixed, -777777: free.</param>
+        /// <param name="rz">Imposed rotation in global Z direction for the constraint. 0: fixed, -777777: free.</param>
+        /// <param name="constraintName">Name of the constraint.</param>
+        /// <returns>Returns the created constraint object.</returns>
         public static SimBC CreateConstraint(int nodeLabel, double dx, double dy, double dz, double rx, double ry, double rz, string constraintName)
         {
             if (basePart as SimPart == null)
@@ -151,13 +162,31 @@
 
             return simBC;
         }
-        
+
+        /// <summary>
+        /// Create a nodal force on a node with givel label, using the given force components and default name.
+        /// </summary>
+        /// <param name="nodeLabel">The array of ResultType used in the envelope</param>
+        /// <param name="fx">X component of the force in Newton and global X direction</param>
+        /// <param name="fy">Y component of the force in Newton and global y direction</param>
+        /// <param name="fz">Z component of the force in Newton and global Z direction</param>
+        /// <returns>Returns the created force object.</returns>
         public static SimBC CreateNodalForce(int nodeLabel, double fx, double fy, double fz)
         {
             string defaultName = "Load(" + nodeLabel.ToString() + ")";
             return CreateNodalForce(nodeLabel, fx, fy, fz, defaultName);
         }
-        
+
+
+        /// <summary>
+        /// Create a nodal force on a node with givel label, using the given force components and name.
+        /// </summary>
+        /// <param name="nodeLabel">The array of ResultType used in the envelope</param>
+        /// <param name="fx">X component of the force in Newton and global X direction</param>
+        /// <param name="fy">Y component of the force in Newton and global y direction</param>
+        /// <param name="fz">Z component of the force in Newton and global Z direction</param>
+        /// <param name="forceName">Name of the nodal force.</param>
+        /// <returns>Returns the created force object.</returns>
         public static SimBC CreateNodalForce(int nodeLabel, double fx, double fy, double fz, string forceName)
         {         
             if (basePart as SimPart == null)

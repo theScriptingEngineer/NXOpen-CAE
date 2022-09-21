@@ -1,4 +1,4 @@
-﻿namespace TheScriptingEngineer
+﻿namespace TheScriptingEngineerCreateMeshCollector
 {
     using System;
     using System.IO; // for path operations
@@ -8,12 +8,13 @@
     using NXOpenUI;
     using NXOpen.UF;
     using NXOpen.Utilities;
-
-    public class ProgramSection2
+    
+    public class Program
     {
-        static NXOpen.Session theSession = NXOpen.Session.GetSession();
-        static ListingWindow theLW = theSession.ListingWindow;
-        static CaePart caePart = (CaePart)theSession.Parts.BaseWork;
+        // global variables used throughout
+        public static Session theSession = Session.GetSession();
+        public static ListingWindow theLW = theSession.ListingWindow;
+        public static BasePart basePart = theSession.Parts.BaseWork;
 
         public static void Main(string[] args)
         {
@@ -25,6 +26,7 @@
             {
                 CreateMeshCollector(thicknesses[ii], ii + 1);
             }
+            
             //CreateMeshCollector(8, 5);
             //CreateMeshCollector(10, 6);
             //CreateMeshCollector(12, 7);
@@ -39,49 +41,45 @@
         /// <param name="label">The label of the physical property. Needs to be unique and thus cannot already be used in the part.</param>
         public static void CreateMeshCollector(double thickness, int label)
         {
-            Session theSession = Session.GetSession();
-            FemPart workFemPart = (FemPart)theSession.Parts.BaseWork;
-            FemPart displayFemPart = (FemPart)theSession.Parts.BaseDisplay;
+            FemPart femPart = (FemPart)theSession.Parts.BaseWork;
             
-            FEModel fEModel1 = (FEModel)workFemPart.BaseFEModel;
-            MeshManager meshManager1 = (MeshManager)fEModel1.MeshManager;
+            FEModel fEModel = (FEModel)femPart.BaseFEModel;
+            MeshManager meshManager = (MeshManager)fEModel.MeshManager;
             
             MeshCollector nullNXOpen_CAE_MeshCollector = null;
-            MeshCollectorBuilder meshCollectorBuilder2;
-            meshCollectorBuilder2 = meshManager1.CreateCollectorBuilder(nullNXOpen_CAE_MeshCollector, "ThinShell");
+            MeshCollectorBuilder meshCollectorBuilder = meshManager.CreateCollectorBuilder(nullNXOpen_CAE_MeshCollector, "ThinShell");
             
-            PhysicalPropertyTable physicalPropertyTable1;
-            physicalPropertyTable1 = workFemPart.PhysicalPropertyTables.CreatePhysicalPropertyTable("PSHELL", "NX NASTRAN - Structural", "NX NASTRAN", "PSHELL2", label);
-            physicalPropertyTable1.SetName(thickness.ToString() + "mm");
+            PhysicalPropertyTable physicalPropertyTable;
+            physicalPropertyTable = femPart.PhysicalPropertyTables.CreatePhysicalPropertyTable("PSHELL", "NX NASTRAN - Structural", "NX NASTRAN", "PSHELL2", label);
+            physicalPropertyTable.SetName(thickness.ToString() + "mm");
             
             //NXOpen.PhysicalMaterial physicalMaterial1 = (NXOpen.PhysicalMaterial)workFemPart.MaterialManager.PhysicalMaterials.FindObject("PhysicalMaterial[Steel]");
-            PhysicalMaterial[] physicalMaterials = workFemPart.MaterialManager.PhysicalMaterials.GetUsedMaterials();
+            PhysicalMaterial[] physicalMaterials = femPart.MaterialManager.PhysicalMaterials.GetUsedMaterials();
             PhysicalMaterial steel = Array.Find(physicalMaterials, material => material.Name == "Steel");
             if (steel == null)
             {
-                steel = workFemPart.MaterialManager.PhysicalMaterials.LoadFromNxlibrary("Steel");
+                steel = femPart.MaterialManager.PhysicalMaterials.LoadFromNxlibrary("Steel");
             }
             
-            PropertyTable propertyTable1;
-            propertyTable1 = physicalPropertyTable1.PropertyTable;
-            propertyTable1.SetMaterialPropertyValue("material", false, steel);
-            propertyTable1.SetTablePropertyWithoutValue("bending material");
-            propertyTable1.SetTablePropertyWithoutValue("transverse shear material");
-            propertyTable1.SetTablePropertyWithoutValue("membrane-bending coupling material");
+            PropertyTable propertyTable;
+            propertyTable = physicalPropertyTable.PropertyTable;
+            propertyTable.SetMaterialPropertyValue("material", false, steel);
+            propertyTable.SetTablePropertyWithoutValue("bending material");
+            propertyTable.SetTablePropertyWithoutValue("transverse shear material");
+            propertyTable.SetTablePropertyWithoutValue("membrane-bending coupling material");
             
-            Unit unit1 = (Unit)workFemPart.UnitCollection.FindObject("MilliMeter");
-            propertyTable1.SetBaseScalarWithDataPropertyValue("element thickness", thickness.ToString(), unit1);
+            Unit unitMilliMeter = (Unit)femPart.UnitCollection.FindObject("MilliMeter");
+            propertyTable.SetBaseScalarWithDataPropertyValue("element thickness", thickness.ToString(), unitMilliMeter);
             
-            meshCollectorBuilder2.CollectorName = thickness.ToString() + "mm"; //"8mm";
-            meshCollectorBuilder2.PropertyTable.SetNamedPropertyTablePropertyValue("Shell Property", physicalPropertyTable1);
+            meshCollectorBuilder.CollectorName = thickness.ToString() + "mm"; //"8mm";
+            meshCollectorBuilder.PropertyTable.SetNamedPropertyTablePropertyValue("Shell Property", physicalPropertyTable);
             
-            NXObject nXObject1;
-            nXObject1 = meshCollectorBuilder2.Commit();
+            NXObject nXObject = meshCollectorBuilder.Commit();
             
-            meshCollectorBuilder2.Destroy();
+            meshCollectorBuilder.Destroy();
 
             // Setting the color of the MeshCollector we just created
-            MeshCollector meshCollector1 = (MeshCollector)nXObject1;
+            MeshCollector meshCollector1 = (MeshCollector)nXObject;
             MeshCollectorDisplayDefaults meshCollectorDisplayDefaults1;
             meshCollectorDisplayDefaults1 = meshCollector1.GetMeshDisplayDefaults();
             

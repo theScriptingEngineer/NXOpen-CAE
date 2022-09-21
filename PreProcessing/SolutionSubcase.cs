@@ -177,6 +177,11 @@
             basePart.Save(BasePart.SaveComponents.True, BasePart.CloseAfterSave.True);
         }
 
+        /// <summary>
+        /// Create a SolverSet with the given name.
+        /// </summary>
+        /// <param name="solverSetname">Name of the SolverSet.</param>
+        /// <returns>Returns the created SimLoadSet object.</returns>
         public static SimLoadSet CreateSolverSet(string solverSetname)
         {
             if (basePart as SimPart == null)
@@ -206,7 +211,12 @@
 
             return simLoadSet;
         }
-        
+
+        /// <summary>
+        /// Adds the given load to the given SolverSet.
+        /// </summary>
+        /// <param name="solverSetname">Name of the SolverSet to add the load to.</param>
+        /// <param name="loadName">Name of the load to add the SolverSet.</param>
         public static void AddLoadToSolverSet(string solverSetname, string loadName)
         {
             if (basePart as SimPart == null)
@@ -242,7 +252,12 @@
             simLoadSet.AddMemberLoads(simLoadMembers);
         }
         
-
+        /// <summary>
+        /// Adds the given SolverSet to the given Subcase.
+        /// </summary>
+        /// <param name="solutionName">Name of the solution to which the subcase belongs to.</param>
+        /// <param name="subcaseName">Name of the Subcase to add the SolverSet to.</param>
+        /// <param name="solverSetname">Name of the SolverSet to add to the Subcase.</param>
         public static void AddSolverSetToSubcase(string solutionName, string subcaseName, string solverSetname)
         {
             if (basePart as SimPart == null)
@@ -299,7 +314,12 @@
             simLoadGroup.AddLoadSet(simLoadSet);
         }
 
-
+        /// <summary>
+        /// Adds the given Load to the given Subcase.
+        /// </summary>
+        /// <param name="solutionName">Name of the solution to which the subcase belongs to.</param>
+        /// <param name="subcaseName">Name of the Subcase to add the Load to.</param>
+        /// <param name="loadName">Name of the Load to add to the Subcase.</param>
         public static void AddLoadToSubcase(string solutionName, string subcaseName, string loadName)
         {
             if (basePart as SimPart == null)
@@ -352,7 +372,11 @@
             simSolutionStep.AddBc(simLoad);
         }
 
-
+        /// <summary>
+        /// Adds the given Constraint to the given Solution.
+        /// </summary>
+        /// <param name="solutionName">Name of the solution to add the constraint to.</param>
+        /// <param name="constraintName">Name of the Constraint to add to the Solution.</param>
         public static void AddConstraintToSolution(string solutionName, string constraintName)
         {
             if (basePart as SimPart == null)
@@ -386,7 +410,13 @@
 
             simSolution.AddBc(simConstraint);
         }
-        
+
+        /// <summary>
+        /// Create a Subcase with the given name under the given Solution.
+        /// </summary>
+        /// <param name="solutionName">Name of the Solution to add the Subcase to.</param>
+        /// <param name="subcaseName">Name of the Subcase.</param>
+        /// <returns>Returns the created SimSolutionStep object.</returns>
         public static SimSolutionStep CreateSubcase(string solutionName, string subcaseName)
         {
             if (basePart as SimPart == null)
@@ -422,7 +452,14 @@
             // create the subcase with the given name but don't activate it
             return simSolution.CreateStep(0, false, subcaseName);
         }
-        
+
+        /// <summary>
+        /// Create a Solution with the given name.
+        /// </summary>
+        /// <param name="solutionName">Name of the Solution to create.</param>
+        /// <param name="outputRequest">Optional structural output requests. If none given or given one not found, the default is created.</param>
+        /// <param name="bulkDataEchoRequest">Optional bulk data output request. If none given or given one not found, the default is created.</param>
+        /// <returns>Returns the created SimSolution object.</returns>
         public static SimSolution CreateSolution(string solutionName, string outputRequest = "Structural Output Requests1", string bulkDataEchoRequest = "Bulk Data Echo Request1")
         {
             if (basePart as SimPart == null)
