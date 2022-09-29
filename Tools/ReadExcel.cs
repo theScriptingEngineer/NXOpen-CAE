@@ -11,7 +11,7 @@
 
 // Tested and working in SimCenter version 2023 release 2022.1
 
-namespace TheScriptingEngineerReadExcel
+namespace TheScriptingEngineer
 {
     using System;
     using System.Data;
@@ -24,7 +24,7 @@ namespace TheScriptingEngineerReadExcel
     using NXOpen.UF;
     using NXOpen.Utilities;
     
-    public class Program
+    public class ReadExcel
     {
         // global variables used throughout
         public static Session theSession = Session.GetSession();

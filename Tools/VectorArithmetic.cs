@@ -10,7 +10,7 @@ namespace TheScriptingEngineerVectorArithmetic
     using NXOpen.Utilities;
     using NXOpen.VectorArithmetic;
 
-    public class Program
+    public class VectorArithmetic
     {
         // global variables used throughout
         public static Session theSession = Session.GetSession();

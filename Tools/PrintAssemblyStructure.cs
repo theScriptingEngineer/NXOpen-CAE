@@ -1,12 +1,12 @@
 ﻿// answer to https://community.sw.siemens.com/s/question/0D54O00007a5m2sSAA/how-can-i-find-a-components-owning-assembly-in-nxopen
 // answer to https://community.sw.siemens.com/s/question/0D54O00007bOTKnSAO/how-to-get-component-in-main-assembly-to-the-sub-assembly-level
-namespace TheScriptingEngineerPrintComponentTree
+namespace TheScriptingEngineer
 {
     using System;
     using NXOpen;
     using NXOpen.CAE; // so we don't need to start everything with NXOpen.CAE
 
-    public class Program
+    public class PrintAssemblyStructure
     {
         static NXOpen.Session theSession = NXOpen.Session.GetSession();
         static ListingWindow theLW = theSession.ListingWindow;

@@ -1,4 +1,4 @@
-﻿namespace TheScriptingEngineerPostProcessing1980
+﻿namespace TheScriptingEngineer
 {
     using System;
     using System.IO; // for path operations
@@ -9,7 +9,7 @@
     using NXOpen.UF;
     using NXOpen.Utilities;
     
-    public class Program
+    public class PostProcessing1980
     {
         // global variables used throughout
         public static Session theSession = Session.GetSession();

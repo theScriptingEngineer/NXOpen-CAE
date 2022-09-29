@@ -1,7 +1,7 @@
 ﻿// "c:\Program Files\Siemens\Simcenter 12.0\NXBIN\run_journal.exe" "C:\Users\Frederik\Documents\basicCsCourse\Section9\Program.cs" -args "C:\Users\Frederik\Documents\SC12\Section9\hullModelNX12_fem1_sim1.sim"
 // "c:\Program Files\Siemens\Simcenter3D_2022.1\NXBIN\run_journal.exe" "C:\Users\Frederik\Documents\basicCsCourse\Section9\Program.cs" -args "C:\Users\Frederik\Documents\SC2022\Section9\hullModelNX12_fem1_sim1.sim"
 
-namespace TheScriptingEngineerSolveSolution
+namespace TheScriptingEngineer
 {
     using System;
     using System.IO; // for path operations
@@ -12,7 +12,7 @@ namespace TheScriptingEngineerSolveSolution
     using NXOpen.UF;
     using NXOpen.Utilities;
     
-    public class Program
+    public class SolveSolution
     {
         // global variables used throughout
         public static Session theSession = Session.GetSession();
