@@ -52,7 +52,7 @@
             string fileContent = "";
             foreach (Point item in points)
             {
-                fileContent = fileContent + item.Coordinates.X.ToString() + "," + item.Coordinates.Y.ToString() + item.Coordinates.Z.ToString() + Environment.NewLine;
+                fileContent = fileContent + item.Coordinates.X.ToString().Replace(",",".") + ";" + item.Coordinates.Y.ToString().Replace(",",".") + ";" + item.Coordinates.Z.ToString().Replace(",",".") + Environment.NewLine;
             }
 
             File.WriteAllText(FullPath, fileContent);
@@ -66,7 +66,7 @@
         {
             foreach (Point item in points)
             {
-                theLW.WriteFullline(item.Coordinates.X.ToString() + "," + item.Coordinates.Y.ToString() + item.Coordinates.Z.ToString());
+                theLW.WriteFullline(item.Coordinates.X.ToString().Replace(",",".") + ";" + item.Coordinates.Y.ToString().Replace(",",".") + ";" + item.Coordinates.Z.ToString().Replace(",","."));
             }
         }
 
