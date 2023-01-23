@@ -1,21 +1,13 @@
-﻿// you need to download and install the Microsoft Access Database Engine 2010 Redistributable
-// on the machine where you are running the journal: http://www.microsoft.com/en-us/download/details.aspx?id=13255
+// This is the default way to read and write excel files.
+// Note that it requires that Excel in installed on the machine you run this script on.
 
-// Code copied from:
-// https://qawithexperts.com/article/c-sharp/read-excel-file-in-c-console-application-example-using-oledb/168
-// this still produces an error: The 'Microsoft.Jet.OLEDB.4.0' provider is not registered on the local machine.
-// found the solution to the error on following links (change from Microsoft.Jet.OLEDB.4.0 to Microsoft.ACE.OLEDB.12.0)
-// https://stackoverflow.com/questions/1991643/microsoft-jet-oledb-4-0-provider-is-not-registered-on-the-local-machine
-// Produces an error Microsoft.ACE.OLEDB.12.0' provider is not registered on the local machine (install Microsoft Access Database Engine 2010 Redistributable)
-// https://stackoverflow.com/questions/6649363/microsoft-ace-oledb-12-0-provider-is-not-registered-on-the-local-machine
+// Code taken from: https://stackoverflow.com/questions/657131/how-to-read-data-of-an-excel-file-using-c
 
-// Tested and working in SimCenter version 2023 release 2022.1
 
+// Untested!
 namespace TheScriptingEngineer
 {
     using System;
-    using System.Data;
-    using System.Data.OleDb; // dotnet add package System.Data.OleDb
     using System.IO; // for path operations
     using System.Collections.Generic; // for lists
     using NXOpen; // so we can use NXOpen functionality
@@ -23,6 +15,8 @@ namespace TheScriptingEngineer
     using NXOpenUI;
     using NXOpen.UF;
     using NXOpen.Utilities;
+
+    using Microsoft.Office.Interop.Excel;  
     
     public class ReadExcel
     {
@@ -36,50 +30,53 @@ namespace TheScriptingEngineer
             // entrypoint for NX
             theLW.Open();
             theLW.WriteFullline("Starting Main() in " + theSession.ExecutingJournal);
-            
+
+            // Get the file to open
             string fileName = args[0]; // @"C:\temp\Sample1.xlsx";
-            //this is the connection string which has OLDB 12 Connection and Source URL of file
-            //use HDR=YES if first excel row contains headers, HDR=NO means your excel's first row is not headers and it's data.
-            string connString = "Provider=Microsoft.ACE.OLEDB.12.0;Data Source=" + fileName + "; Extended Properties='Excel 8.0;HDR=NO;IMEX=1;'";
-            theLW.WriteFullline("Using database connection string: " + connString);
-          
-            // Create the connection object
-            System.Data.OleDb.OleDbConnection oledbConn = new OleDbConnection(connString);
-            try
+
+            //create the Application object we can use in the member functions.
+            Microsoft.Office.Interop.Excel.Application _excelApp = new Microsoft.Office.Interop.Excel.Application();
+            _excelApp.Visible = true;
+
+            //open the workbook
+            Workbook workbook = _excelApp.Workbooks.Open(fileName,
+                Type.Missing, Type.Missing, Type.Missing, Type.Missing,
+                Type.Missing, Type.Missing, Type.Missing, Type.Missing,
+                Type.Missing, Type.Missing, Type.Missing, Type.Missing,
+                Type.Missing, Type.Missing);
+
+            //select the first sheet        
+            Worksheet worksheet = (Worksheet)workbook.Worksheets[1];
+
+            // Access a single cell
+            Excel.Range targetRange = worksheet.get_Range("A1");
+            theLW.WriteFullline(targetRange.Value);
+            targetRange.Value = 10;
+            theLW.WriteFullline(targetRange.Value);
+
+            //find the used range in worksheet
+            Range excelRange = worksheet.UsedRange;
+
+            //get an object array of all of the cells in the worksheet (their values)
+            object[,] valueArray = (object[,])excelRange.get_Value(
+                        XlRangeValueDataType.xlRangeValueDefault);
+
+            //access the cells
+            for (int row = 1;  row <= worksheet.UsedRange.Rows.Count; ++row)
             {
-                // Open connection
-                oledbConn.Open();
-
-                // Create OleDbCommand object and select data from worksheet Sample-spreadsheet-file
-                // here sheet name is Sheet1, usually it is Sheet1, Sheet2 etc..
-                OleDbCommand cmd = new OleDbCommand("SELECT * FROM [Sheet1$]", oledbConn);
-
-                // Create new OleDbDataAdapter
-                OleDbDataAdapter oleda = new OleDbDataAdapter();
-
-                oleda.SelectCommand = cmd;
-
-                // Create a DataSet which will hold the data extracted from the worksheet.
-                DataSet ds = new DataSet();
-
-                // Fill the DataSet from the data extracted from the worksheet.
-                oleda.Fill(ds, "DataTable");
-
-                //loop through each row
-                foreach(DataRowView item in ds.Tables[0].DefaultView)
+                for (int col = 1; col <= worksheet.UsedRange.Columns.Count; ++col)
                 {
-                    theLW.WriteFullline(item.Row.ItemArray[0] +" "+item.Row.ItemArray[1] +" "+item.Row.ItemArray[2]);
+                    //access each cell
+                    theLW.WriteFullline(valueArray[row, col].ToString());
                 }
             }
-            catch (Exception e)
-            {
-                theLW.WriteFullline("Error :" + e.Message);
-            }
-            finally
-            {
-                // Close connection
-                oledbConn.Close();
-            }
+
+            //clean up stuffs
+            workbook.Close(false, Type.Missing, Type.Missing);
+            Marshal.ReleaseComObject(workbook);
+
+            _excelApp.Quit();
+            Marshal.FinalReleaseComObject(_excelApp);
         }
     }
 }

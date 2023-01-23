@@ -30,4 +30,4 @@ In order to have intellisense do either of the following:
  This repository and the course on Udemy focus on journals only, meaning none of the code is compiled.
  Since I'm writing code on a linux machine, I'm referencing the netcoreapp3.1 as the targetframework, which also needs to be installed on the machine.
 
- For windows users please visit my course or the excellent blog from [Jan Boetcher](https://www.ib-boettcher.de/en/post/nxopen-vscode/)
+ For windows users please visit my [course]((https://www.udemy.com/course/simcenter3d-basic-nxopen-course/?referralCode=4ABC27CFD7D2C57D220B%20)) or the excellent blog from [Jan Boetcher](https://www.ib-boettcher.de/en/post/nxopen-vscode/)

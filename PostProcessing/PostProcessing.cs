@@ -125,22 +125,6 @@
                 return;
             }
 
-            // add .unv and path from .sim file to unvFileName if required
-            string unvFullName = CreateFullPath(unvFileName);
-
-            // Check if unvFullName is not already in use by another companion result
-            // No risk of checking the file for this companion result as DeleteCompanionResult has already been called.
-            try
-            {
-                CheckUnvFileName(unvFullName);
-            }
-            catch (System.Exception ex)
-            {
-                // ChechUnvFileName throws an error with the message containing the filename and the companion result.
-                theLW.WriteFullline(ex.Message);
-                return;
-            }
-
             // Select the solution to add the companion result to
             SimResultReference simResultReference;
             if (GetSolution(solutionName) != null)
@@ -164,6 +148,21 @@
                 simResultReference = GetSimResultReference(postInputs[0].Solution);
             }
 
+            // add .unv and path from .sim file to unvFileName if required
+            string unvFullName = CreateFullPath(unvFileName);
+
+            // Check if unvFullName is not already in use by another companion result
+            // No risk of checking the file for this companion result as DeleteCompanionResult has already been called.
+            try
+            {
+                CheckUnvFileName(unvFullName);
+            }
+            catch (System.Exception ex)
+            {
+                // ChechUnvFileName throws an error with the message containing the filename and the companion result.
+                theLW.WriteFullline(ex.Message);
+                return;
+            }
             // Load all results
             SolutionResult[] solutionResults = LoadResults(postInputs);
             
@@ -559,8 +558,8 @@
         }
 
         /// <summary>
-        /// Helper function for CombineResults, ExportResult and SortResults.
-        /// Loads the results in the provided array of PostInput
+        /// Loads the results for the given list of PostInput and returns a list of SolutionResult.
+        /// An exception is raised if the result does not exist (-> to check if CreateReferenceResult raises error or returns None)
         /// </summary>
         /// <param name="postInputs">The result of each of the provided solutions is loaded.</param>
         /// <param name="referenceType">The type of SimResultReference eg. Structural</param>
@@ -682,6 +681,7 @@
         /// This function takes a filename and adds the .unv extension and path of the part if not provided by the user.
         /// If the fileName contains an extension, this function leaves it untouched, othwerwise adds .unv as extension.
         /// If the fileName contains a path, this function leaves it untouched, otherwise adds the path of the BasePart as the path.
+        /// Undefined behaviour if basePart has not yet been saved (eg FullPath not available)
         /// </summary>
         /// <param name="fileName">The filename with or without path and .unv extension.</param>
         /// <returns>A string with .unv extension and path of the basePart if the fileName parameter did not include a path.</returns>
@@ -705,8 +705,9 @@
         }
 
         /// <summary>
-        /// This function verifies if all PostInputs to make sure no errors occur further down the line due to input errors.
-        /// Note that Identifiers are not checked but a separate method exists!
+        /// Check if the provided list of PostInput will not return an error when used in CombineResults.
+        /// Identifiers are checked with separate function CheckPostInputIdentifiers
+        /// Raises exceptions which can be caught by the user.
         /// </summary>
         /// <param name="postInputs">The array of PostInput to check.</param>
         public static void CheckPostInput(PostInput[] postInputs)

@@ -25,7 +25,7 @@ namespace TheScriptingEngineerCsysFromDatum
         /// Creates a Cartesion coordinates system using a datumPlane as input.
         /// The orthogonal vectors are constructed in the plane to define the coordinate system, using basic geometry.
         /// </summary>
-        /// <param name="datumPlane">Instance of the datumPlane to create the coordinate system for</param>
+        /// <param name="datumPlane">Instance of the datumPlane to create the coordinate system for.</param>
         /// <returns>A coordinate system which has the same origin as the plane with x and y axis in the plane.</returns>
         public static CartesianCoordinateSystem CreateCsysFromDatum(DatumPlane datumPlane)
         {
