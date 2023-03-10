@@ -1,4 +1,4 @@
-namespace TheScriptingEngineerCsysFromDatum
+namespace TheScriptingEngineer
 {
     using System;
     using System.IO; // for path operations
@@ -9,7 +9,7 @@ namespace TheScriptingEngineerCsysFromDatum
     using NXOpen.UF;
     using NXOpenUI;
 
-    public class Program
+    public class CsysFromDatum
     {
         static NXOpen.Session theSession = NXOpen.Session.GetSession();
         static ListingWindow theLW = theSession.ListingWindow;

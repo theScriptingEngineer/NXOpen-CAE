@@ -9,7 +9,7 @@
     using NXOpen.UF;
     using NXOpen.Utilities;
     
-    internal class AddPartToAssembly
+    public class AddPartToAssembly
     {
         // global variables used throughout
         public static Session theSession = Session.GetSession();

@@ -1,4 +1,4 @@
-﻿namespace TheScriptingEngineerPostProcessing
+﻿namespace TheScriptingEngineer
 {
     using System;
     using System.IO; // for path operations

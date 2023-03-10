@@ -1,4 +1,4 @@
-namespace TheScriptingEngineerVectorArithmetic
+namespace TheScriptingEngineer
 {
     using System;
     using System.IO; // for path operations
