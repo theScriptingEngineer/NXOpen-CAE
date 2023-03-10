@@ -60,6 +60,12 @@ namespace TheScriptingEngineer
             theSession.Parts.SetWork(basePart);
         }
 
+        /// <summary>
+        /// This function writes an elemental and element-nodal result to a universal file.
+        /// The content of the result is the shell thickness of all shell elements in the model.
+        /// </summary>
+        /// <param name="baseFemPart">The BaseFemPart to generate the thickness result for.</param>
+        /// <param name="fileName">The name of the universal file to write the results to</param>
         public static void WriteThicknessResults(BaseFemPart baseFemPart, string fileName)
         {
             string[] datasets = CreateThicknessDatasets(baseFemPart);
@@ -88,8 +94,8 @@ namespace TheScriptingEngineer
             {
                 if (item.Value.Shape.ToString() == "Quad" || item.Value.Shape.ToString() == "Tri")
                 {
-                    thicknessDatasetElemental = thicknessDatasetElemental + CreateThicknessRecord(baseFemPart, item.Value)[0];
-                    thicknessDatasetElementNodal = thicknessDatasetElementNodal + CreateThicknessRecord(baseFemPart, item.Value)[1];
+                    thicknessDatasetElemental = thicknessDatasetElemental + CreateThicknessRecords(baseFemPart, item.Value)[0];
+                    thicknessDatasetElementNodal = thicknessDatasetElementNodal + CreateThicknessRecords(baseFemPart, item.Value)[1];
                 }
             }
 
@@ -100,7 +106,14 @@ namespace TheScriptingEngineer
             return thicknessDataSets;
         }
 
-        public static string[] CreateThicknessRecord(BaseFemPart baseFemPart, FEElement fEElement)
+        /// <summary>
+        /// This function returns a representation of the Results used in PostInputs.
+        /// Note that the representation is taken from the SolutionResult and not the SimSolution!
+        /// </summary>
+        /// <param name="baseFemPart">The BaseFemPart to generate the thickness datasets for.</param>
+        /// <param name="fEElement">The FEElement for which to generate to thickness records for.</param>
+        /// <returns>An array with the elemental and element-nodal record for the given FEElement.</returns>
+        public static string[] CreateThicknessRecords(BaseFemPart baseFemPart, FEElement fEElement)
         {
             // user feedback, but not for all, otherwise some performance hit.
             if (fEElement.Label % 1000 == 0)
@@ -117,7 +130,7 @@ namespace TheScriptingEngineer
 
             // even though the second record is 1 (data present for all nodes) SimCenter will not read it properly use the first value for all nodes!!
             // some versions of (NX12) will even give a "result file in wrong format" error. In this case, simply change the value to 2
-            string Record14ElemenNodal = String.Format("{0, 10}", fEElement.Label) + String.Format("{0, 10}", "2") +  String.Format("{0, 10}", fEElement.GetNodes().Length) + String.Format("{0, 10}", "1") + Environment.NewLine;
+            string Record14ElementNodal = String.Format("{0, 10}", fEElement.Label) + String.Format("{0, 10}", "2") +  String.Format("{0, 10}", fEElement.GetNodes().Length) + String.Format("{0, 10}", "1") + Environment.NewLine;
 
             // Get the element nodal thickness form the element associated data (if defined)
             ElementAssociatedDataUtils elementAssociatedDataUtils = baseFemPart.BaseFEModel.NodeElementMgr.ElemAssociatedDataUtils;
@@ -169,10 +182,16 @@ namespace TheScriptingEngineer
 
             Record15ElementNodal = Record15ElementNodal + Environment.NewLine;
 
-            string[] result = { Record14Elemental + Record15Elemental, Record14ElemenNodal + Record15ElementNodal };
+            string[] result = { Record14Elemental + Record15Elemental, Record14ElementNodal + Record15ElementNodal };
             return result;
         }
 
+        /// <summary>
+        /// Get all elements from the model.
+        /// Note that this is the most performant way to do so.
+        /// </summary>
+        /// <param name="baseFemPart">The BaseFemPart to get the elements from.</param>
+        /// <returns>An array of all FEElements in the baseFemPart.</returns>
         public static SortedList<int, FEElement> GetAllFEElements(BaseFemPart baseFemPart)
         {
             SortedList<int, FEElement> allElements = new SortedList<int, FEElement>();
@@ -188,6 +207,13 @@ namespace TheScriptingEngineer
             return allElements;
         }
 
+        /// <summary>
+        /// Creates a universal file dataset header.
+        /// </summary>
+        /// <param name="datasetLabel">The label for the dataset.</param>
+        /// <param name="datasetName">The name for the dataset.</param>
+        /// <param name="type">The type of result for the dataset: "Elemental" or "Element-Nodal"</param>
+        /// <returns>The header as a string.</returns>
         public static string CreateThicknessHeader(int datasetLabel, string datasetName, string type)
         {
             theUFSession.Ui.SetStatus("Creating thickness header");
@@ -212,16 +238,16 @@ namespace TheScriptingEngineer
                 return null;
             }
             
-            header = header + "RESULT_NAME_KEY " + datasetName + "\n"; // record 4 - analysis dataset name 40A2: using this syntax, will set the resulttype to Thickness
-            header = header + "NONE" + "\n"; // record 5 - analysis dataset name 40A2: using this syntax, Simcenter will parse it and show in the GUI.
-            header = header + "EXPRESSION_NAME_KEY " + datasetName + "\n"; // record 6 - analysis dataset name 40A2: using this syntax, Simcenter will parse it and show in the GUI.
+            header = header + "RESULT_NAME_KEY " + datasetName + Environment.NewLine; // record 4 - analysis dataset name 40A2: using this syntax, will set the resulttype to Thickness
+            header = header + "NONE" + Environment.NewLine; // record 5 - analysis dataset name 40A2: using this syntax, Simcenter will parse it and show in the GUI.
+            header = header + "EXPRESSION_NAME_KEY " + datasetName + Environment.NewLine; // record 6 - analysis dataset name 40A2: using this syntax, Simcenter will parse it and show in the GUI.
             header = header + "Creation time: "  + DateTime.UtcNow.ToLongDateString() + "\n"; // record 7 - analysis dataset name 40A2: using this syntax, Simcenter will parse it and show in the GUI.
-            header = header + "NONE" + "\n"; // record 8 - analysis dataset name 40A2: using this syntax, Simcenter will parse it and show in the GUI.
-            header = header + String.Format("{0,10}", "1") + String.Format("{0,10}", "1") + String.Format("{0,10}", "1") + String.Format("{0,10}", "94") + String.Format("{0,10}", "2") + String.Format("{0,10}", "1") + "\n"; // record 9
+            header = header + "NONE" + Environment.NewLine; // record 8 - analysis dataset name 40A2: using this syntax, Simcenter will parse it and show in the GUI.
+            header = header + String.Format("{0,10}", "1") + String.Format("{0,10}", "1") + String.Format("{0,10}", "1") + String.Format("{0,10}", "94") + String.Format("{0,10}", "2") + String.Format("{0,10}", "1") + Environment.NewLine; // record 9
             header = header + String.Format("{0,10}", "1") + String.Format("{0,10}", "0") + String.Format("{0,10}", datasetLabel) + String.Format("{0,10}", "0") + String.Format("{0,10}", "1") + String.Format("{0,10}", "0") + String.Format("{0,10}", "0") + String.Format("{0,10}", "0") + Environment.NewLine; //record 10: using this syntax for Simcenter to parse it properly
             header = header + String.Format("{0,10}", "0") + String.Format("{0,10}", "0") + "\n"; //record 11: using this syntax for Simcenter to parse it properly
-            header = header + String.Format("{0,13}", "0.00000E+00") + String.Format("{0,13}", "0.00000E+00") + String.Format("{0,13}", "0.00000E+00") + String.Format("{0,13}", "0.00000E+00") + String.Format("{0,13}", "0.00000E+00") + String.Format("{0,13}", "0.00000E+00") + "\n"; // record 12: using this syntax for Simcenter to parse it properly
-            header = header + String.Format("{0,13}", "0.00000E+00") + String.Format("{0,13}", "0.00000E+00") + String.Format("{0,13}", "0.00000E+00") + String.Format("{0,13}", "0.00000E+00") + String.Format("{0,13}", "0.00000E+00") + String.Format("{0,13}", "0.00000E+00") + "\n"; // record 13: using this syntax for Simcenter to parse it properly
+            header = header + String.Format("{0,13}", "0.00000E+00") + String.Format("{0,13}", "0.00000E+00") + String.Format("{0,13}", "0.00000E+00") + String.Format("{0,13}", "0.00000E+00") + String.Format("{0,13}", "0.00000E+00") + String.Format("{0,13}", "0.00000E+00") + Environment.NewLine; // record 12: using this syntax for Simcenter to parse it properly
+            header = header + String.Format("{0,13}", "0.00000E+00") + String.Format("{0,13}", "0.00000E+00") + String.Format("{0,13}", "0.00000E+00") + String.Format("{0,13}", "0.00000E+00") + String.Format("{0,13}", "0.00000E+00") + String.Format("{0,13}", "0.00000E+00") + Environment.NewLine; // record 13: using this syntax for Simcenter to parse it properly
             
             return header;
         }

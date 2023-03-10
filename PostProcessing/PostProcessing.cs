@@ -1,4 +1,4 @@
-﻿namespace TheScriptingEngineer
+﻿namespace TheScriptingEngineerPostProcessing
 {
     using System;
     using System.IO; // for path operations
@@ -263,7 +263,7 @@
         /// </summary>
         /// <param name="postInput">The input for the export as a single PostInput. Identifier is ignored.</param>
         /// <param name="unvFileName">Name of the .unv file to write the combined result to. Can be with or without path and file extension. If without, file with .unv extension is saved with the .sim file.</param>
-        /// </param>
+        /// <param name="sIUnits">Force the export to SI units.</param>
         public static void ExportResult(PostInput postInput, string unvFileName, bool sIUnits = false)
         {
             // user feedback

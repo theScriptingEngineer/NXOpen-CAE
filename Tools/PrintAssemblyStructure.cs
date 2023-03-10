@@ -10,7 +10,6 @@ namespace TheScriptingEngineer
     {
         static NXOpen.Session theSession = NXOpen.Session.GetSession();
         static ListingWindow theLW = theSession.ListingWindow;
-        static BasePart basePart = theSession.Parts.BaseWork;
 
         public static void Main(string[] args)
         {
@@ -25,6 +24,7 @@ namespace TheScriptingEngineer
             }
             theLW.WriteFullline("");
 
+            BasePart basePart = theSession.Parts.BaseWork;
             BasePart baseDisplayPart = theSession.Parts.BaseDisplay;
             theLW.WriteFullline("The current workpart is: " + basePart.Name + " located in " + basePart.FullPath);
             theLW.WriteFullline("The current displaypart is: " + baseDisplayPart.Name + " located in " + baseDisplayPart.FullPath);
@@ -37,7 +37,7 @@ namespace TheScriptingEngineer
         /// <summary>
         /// Prints the component tree for the given component to the listing window.
         /// </summary>
-        /// <param name="component">Name of the SolverSet.</param>
+        /// <param name="component">The component for whch to print the component tree</param>
         /// <param name="requestedLevel">Optional parameter used for creating indentations.</param>
         public static void PrintComponentTree(NXOpen.Assemblies.Component component, int requestedLevel = 0)
         {
@@ -104,9 +104,10 @@ namespace TheScriptingEngineer
         }
 
         /// <summary>
-        /// Helper method to create indentations in the listing window.
+        /// Helper method to create indentations (eg tabs) with a given length.
         /// </summary>
         /// <param name="level">The depth of the indentations.</param>
+        /// <returns>A string with the indentations.</returns>
         public static string Indentation(int level)
         {
             string indentation = "";

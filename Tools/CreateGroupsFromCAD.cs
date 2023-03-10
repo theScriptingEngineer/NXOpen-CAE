@@ -60,6 +60,13 @@
             AddRelatedNodesAndElements(femPart);
         }
 
+        /// <summary>
+        /// This function cycles through all cae groups in a CaePart.
+        /// For each group it adds the related nodes and elements for the bodies and faces in the group.
+        /// Practical for repopulating groups after a (partial) remesh.
+        /// Function is idempotent.
+        /// </summary>
+        /// <param name="caePart">The CaePart to perform this operation on.</param>
         public static void AddRelatedNodesAndElements(CaePart caePart)
         {
             CaeGroup[] caeGroups = caePart.CaeGroups.ToArray();
@@ -101,6 +108,15 @@
             }
         }
 
+        /// <summary>
+        /// This function creates a group with faces and bodies for each named datum plane in the associated cad part.
+        /// All named datum planes are collected from the associated cad part.
+        /// Then for each datum plane a selection recipe is created, "centered around" the datum plane, with the faces and bodies.
+        /// For each selection recipe a group is created and the selection recipe deleted.
+        /// Groups are created instead of selection recipes because older versions of Simcenter cannot use selection recipes in post-processing.
+        /// Function is idempotent.
+        /// </summary>
+        /// <param name="femPart">The part in whcih to create the groups.</param>
         public static void CreateGroupsFromNamedPlanes(FemPart femPart)
         {
             // Get the associated cad part
@@ -157,6 +173,14 @@
             femPart.SelectionRecipes.Delete(selectionRecipes);
         }
 
+        /// <summary>
+        /// This function creates a selection recipe around a given datum plane.
+        /// Since a selection recipe is not infinite, the dimensions are hard coded, but can be easily adjusted.
+        /// </summary>
+        /// <param name="femPart">The part in whcih to create a selection recipe.</param>
+        /// <param name="datumPlane">A datum plane, which is used to define the selection recipe.</param>
+        /// <param name="entitytypes">An array of filters for the type of objects to add to the selection recipe.</param>
+        /// <returns>The created selection recipe.</returns>
         public static SelectionRecipe CreateSelectionRecipe(FemPart femPart, DatumPlane datumPlane, CaeSetGroupFilterType[] entitytypes)
         {
             double recipeThickness = 1;
@@ -177,7 +201,6 @@
             double projectionMagnitude = normal.Dot(global);
             Vector3 globalOnNormal = projectionMagnitude * normal;
             Vector3 globalOnPlane = global - globalOnNormal;
-
             // normalize
             globalOnPlane.Normalize();
             
@@ -212,10 +235,17 @@
             return selectionRecipe;
         }
 
-        public static DatumPlane[] GetNamedDatumPlanes(Part associatedCadPart)
+        /// <summary>
+        /// This function searches the part for all datum planes with a name and returns them.
+        /// Naming a datum plane is done by right-clicking on the plane in the GUI and selecting rename.
+        /// </summary>
+        /// <param name="cadPart">The part for which to return the named datum planes.</param>
+        /// <returns>An array with the named datum planes.</returns>
+        public static DatumPlane[] GetNamedDatumPlanes(Part cadPart)
         {
+            // using a list to easily add items, turning it into an array before returning.
             List<DatumPlane> namedDatumPlanes = new List<DatumPlane>();
-            foreach (DisplayableObject item in associatedCadPart.Datums.ToArray())
+            foreach (DisplayableObject item in cadPart.Datums.ToArray())
             {
                 if (item is DatumPlane)
                 {
@@ -228,7 +258,14 @@
 
             return namedDatumPlanes.ToArray();
         }
-        
+
+        /// <summary>
+        /// This function returns the associated cad part for a given FemPart.
+        /// Will load the part if not loaded.
+        /// It assumes that the FemPart has an associated cad part (is not an orphan mesh)
+        /// </summary>
+        /// <param name="femPart">The FemPart for which to return the associated cad part.</param>
+        /// <returns>The associated cad part.</returns>
         public static Part GetAssociatedCadPart(FemPart femPart)
         {
             Part associatedCadPart = femPart.AssociatedCadPart;

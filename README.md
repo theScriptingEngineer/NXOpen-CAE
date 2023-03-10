@@ -2,8 +2,12 @@
 
 This is a repository with NXOpen code for Siemens SimCenter 3D (aka NX CAE) in C#
 
+## Learning NXOpen
+
 If you are interested in learning NXOpen, please check out my course on Udemy:
 [SimCenter 3D basic NXOpen course (C#)](https://www.udemy.com/course/simcenter3d-basic-nxopen-course/?referralCode=4ABC27CFD7D2C57D220B%20)
+
+**30% off with coupon code WHYCLICKJUSTSCRIPT (valid till April 6th 2023)**
 
 ## Documentation of the journals in this repository
 

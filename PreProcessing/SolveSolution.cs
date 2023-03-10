@@ -12,7 +12,7 @@ namespace TheScriptingEngineer
     using NXOpen.UF;
     using NXOpen.Utilities;
     
-    public class SolveSolution
+    public class Solve
     {
         // global variables used throughout
         public static Session theSession = Session.GetSession();
@@ -27,7 +27,7 @@ namespace TheScriptingEngineer
 
             if (args.Length == 0)
             {
-                // no arguments passesd
+                // no arguments passed
                 // write some sort of a help
                 theLW.WriteFullline("Need to pass the full path of the .sim file as a first argument.");
                 theLW.WriteFullline("All additional parameters should be solutions to solve.");
@@ -99,6 +99,7 @@ namespace TheScriptingEngineer
             if (simSolution == null)
             {
                 theLW.WriteFullline("Solution with name " + solutionName + " could not be found in " + simPart.FullPath);
+                return;
             }
 
             // solve the solution

@@ -59,6 +59,12 @@ namespace TheScriptingEngineerVectorArithmetic
             theLW.WriteFullline("Test normalized = " + PrintVector3(test));
         }
 
+        /// <summary>
+        /// This function takes a NXOpen.VectorArithmetic.Vector3 and creates a string representation.
+        /// Required because there is not overridden ToString() method in the class.
+        /// </summary>
+        /// <param name="vector">The vector to represent as string.</param>
+        /// <returns>A string representation of a NXOpen.VectorArithmetic.Vector3</returns>
         public static string PrintVector3(Vector3 vector)
         {
             return "(" + vector.x.ToString() + ", " + vector.y.ToString() + ", " + vector.z.ToString() + ")";

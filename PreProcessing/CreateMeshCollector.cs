@@ -9,7 +9,7 @@
     using NXOpen.UF;
     using NXOpen.Utilities;
     
-    public class CreateMeshCollector
+    public class CreateMeshCollectorClass
     {
         // global variables used throughout
         public static Session theSession = Session.GetSession();
@@ -79,9 +79,9 @@
             meshCollectorBuilder.Destroy();
 
             // Setting the color of the MeshCollector we just created
-            MeshCollector meshCollector1 = (MeshCollector)nXObject;
+            MeshCollector meshCollector = (MeshCollector)nXObject;
             MeshCollectorDisplayDefaults meshCollectorDisplayDefaults1;
-            meshCollectorDisplayDefaults1 = meshCollector1.GetMeshDisplayDefaults();
+            meshCollectorDisplayDefaults1 = meshCollector.GetMeshDisplayDefaults();
             
             // we set the color as label * 10 to make a distinction between the colors. The maximum color number is 216, therefore we take the modulus to not exceed this numer (eg. 15%4 -> 3)
             meshCollectorDisplayDefaults1.Color = NXColor.Factory._Get((label * 10) % 216); //workFemPart.Colors.Find("Smoke Gray");

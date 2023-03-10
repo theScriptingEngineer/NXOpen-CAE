@@ -102,7 +102,7 @@
         /// <param name="unvFileName">Name of the .unv file to write the evenloped result to. Can be with or without path and file extension. If without, file with .unv extension is saved with the .sim file.</param>
         /// <param name="envelopeOperation">The type of envelope operation to perform.</param>
         /// <param name="resultComponent">The component for which to perform the envelope operation.</param>
-        /// <param name="resultSection">The section to use in the envelope operation.</param>
+        /// <param name="resultShellSection">The section to use in the envelope operation.</param>
         /// <param name="absolute">envelope using absolute values or signed values. Note that you sort the absolute values and not take the absolute value of the sorted result.</param>
         /// <param name="solutionName">Optinal: The name of the solution result to add the companion result result to. Defaults to the solution provided in the first PostInput element.</param>
         public static void EnvelopeResults(PostInput[] postInputs, string companionResultName, string unvFileName, ResultsManipulationEnvelopeBuilder.Operation envelopeOperation,  Result.ShellSection resultShellSection, Result.Component resultComponent, bool absolute, string solutionName = "")
@@ -260,7 +260,7 @@
         /// </summary>
         /// <param name="postInput">The input for the export as a single PostInput. Identifier is ignored.</param>
         /// <param name="unvFileName">Name of the .unv file to write the combined result to. Can be with or without path and file extension. If without, file with .unv extension is saved with the .sim file.</param>
-        /// </param>
+        /// <param name="sIUnits">Force the export to SI units.</param>
         public static void ExportResult(PostInput postInput, string unvFileName, bool sIUnits = false)
         {
             // user feedback
