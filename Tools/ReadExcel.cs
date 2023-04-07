@@ -1,10 +1,11 @@
 // This is the default way to read and write excel files.
 // Note that it requires that Excel in installed on the machine you run this script on.
+// The downside is that you cannot run this as a journal, since you need to add the EPPLus package.
 
 // Code taken from: https://stackoverflow.com/questions/657131/how-to-read-data-of-an-excel-file-using-c
 
+// Will not work as a script, since Microsoft.Office.Interop.Excel is not loaded within NX.
 
-// Untested!
 namespace TheScriptingEngineer
 {
     using System;
@@ -16,7 +17,7 @@ namespace TheScriptingEngineer
     using NXOpen.UF;
     using NXOpen.Utilities;
 
-    using Microsoft.Office.Interop.Excel;  
+    using Microsoft.Office.Interop.Excel;
     
     public class ReadExcel
     {
