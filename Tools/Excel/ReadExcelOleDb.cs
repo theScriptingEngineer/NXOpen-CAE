@@ -1,6 +1,6 @@
 ﻿// using this method you don't need to have Excel installed on the machine you are running this journal on.
 // Note that you do need to install the redistributible.
-// NOTE: You can only read and write to the Excel file, but CANNOT run Excel calculations (eg. when you change a value, the formulas will NOT update).
+// NOTE: You can only read and write Excel FILES, but CANNOT run Excel calculations (eg. when you change a value, the formulas will NOT update).
 
 // you need to download and install the Microsoft Access Database Engine 2010 Redistributable
 // on the machine where you are running the journal: http://www.microsoft.com/en-us/download/details.aspx?id=13255
@@ -12,6 +12,9 @@
 // https://stackoverflow.com/questions/1991643/microsoft-jet-oledb-4-0-provider-is-not-registered-on-the-local-machine
 // Produces an error Microsoft.ACE.OLEDB.12.0' provider is not registered on the local machine (install Microsoft Access Database Engine 2010 Redistributable)
 // https://stackoverflow.com/questions/6649363/microsoft-ace-oledb-12-0-provider-is-not-registered-on-the-local-machine
+
+// For writing:
+// https://stackoverflow.com/questions/19662937/write-data-to-excel-using-oledb
 
 // Tested and working in SimCenter version 2023 release 2022.1
 
@@ -42,8 +45,9 @@ namespace TheScriptingEngineer
             theLW.WriteFullline("Starting Main() in " + theSession.ExecutingJournal);
             
             string fileName = args[0]; // @"C:\temp\Sample1.xlsx";
-            //this is the connection string which has OLDB 12 Connection and Source URL of file
-            //use HDR=YES if first excel row contains headers, HDR=NO means your excel's first row is not headers and it's data.
+            // this is the connection string which has OLDB 12 Connection and Source URL of file
+            // use HDR=YES if first excel row contains headers, HDR=NO means your excel's first row is not headers and it's data.
+            // set IMEX=3;READONLY=FALSE for writing (so that SQL Insert and Update can be used)
             string connString = "Provider=Microsoft.ACE.OLEDB.12.0;Data Source=" + fileName + "; Extended Properties='Excel 8.0;HDR=NO;IMEX=1;'";
             theLW.WriteFullline("Using database connection string: " + connString);
           
