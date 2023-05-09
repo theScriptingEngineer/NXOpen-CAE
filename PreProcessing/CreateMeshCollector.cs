@@ -12,9 +12,9 @@
     public class CreateMeshCollectorClass
     {
         // global variables used throughout
-        public static Session theSession = Session.GetSession();
-        public static ListingWindow theLW = theSession.ListingWindow;
-        public static BasePart basePart = theSession.Parts.BaseWork;
+        static Session theSession = Session.GetSession();
+        static ListingWindow theLW = theSession.ListingWindow;
+        static CaePart caePart = (CaePart)theSession.Parts.BaseWork;
 
         public static void Main(string[] args)
         {
@@ -52,7 +52,6 @@
             
             // Get the highest label from the physical properties to then pass as parameter in the creation of a physical property.
             PhysicalPropertyTable[] physicalPropertyTables = caePart.PhysicalPropertyTables.ToArray();
-            PhysicalPropertyTable physicalPropertyTable = Array.Find(physicalPropertyTables, physPropTable => physPropTable.Name.ToLower() == physicalPropertyName.ToLower());
             int maxLabel = 1;
             if (physicalPropertyTables.Length != 0)
             {
@@ -94,7 +93,7 @@
             meshCollectorDisplayDefaults1 = meshCollector.GetMeshDisplayDefaults();
             
             // we set the color as label * 10 to make a distinction between the colors. The maximum color number is 216, therefore we take the modulus to not exceed this numer (eg. 15%4 -> 3)
-            meshCollectorDisplayDefaults1.Color = NXColor.Factory._Get((label * 10) % 216); //workFemPart.Colors.Find("Smoke Gray");
+            meshCollectorDisplayDefaults1.Color = NXColor.Factory._Get((maxLabel * 10) % 216); //workFemPart.Colors.Find("Smoke Gray");
             
             meshCollectorDisplayDefaults1.Dispose();
         }
