@@ -33,12 +33,21 @@
 //    - <SubIteration>-1</SubIteration>
 //    - <Result>[Displacement][Nodal]</Result>
 //    - <Component>Magnitude</Component>
-//  It is advised to also delete the group visibility settings in the post template xml file:
-//  - <GroupVisibilities>
+
+//  It is advised to update the group visibility with the following (assuming there are less than 1000 groups in the model).
+//  Note that other types might exist (like <Num3DGroups>). Adjust accordingly.
+//		<GroupVisibilities>
+//			<Num1DGroups>1000</Num1DGroups>
+//			<Visibilities1DGroups>1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1</Visibilities1DGroups>
+//			<Num2DGroups>1000</Num2DGroups>
+//			<Visibilities2DGroups>1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1</Visibilities2DGroups>
+//		</GroupVisibilities>
+
+
 //  Post processing XML template files are located under the location where UGII_CAE_POST_TEMPLATE_USER_DIR is pointing to.
 //  This can be found in the log file.
 //  If you also set UGII_CAE_POST_TEMPLATE_EDITOR to for example notepad++.exe,
-//  you can directly edit be right-clicking the template in the NX GUI
+//  you can directly edit by right-clicking the template in the NX GUI
 
 namespace TheScriptingEngineerScreenShotCreator
 {
@@ -63,7 +72,6 @@ namespace TheScriptingEngineerScreenShotCreator
         public static void Main(string[] args)
         {
             theLW.Open();
-            theLW.WriteFullline("Starting Main() in " + theSession.ExecutingJournal);
 
             // user feedback
             if (theSession.Parts.BaseWork as SimPart == null)
@@ -140,8 +148,10 @@ namespace TheScriptingEngineerScreenShotCreator
 
             int postViewId = -1;
             // process the screen shots
+            theLW.WriteFullline("Generated " + screenShots.Length + " screenshots with the following input:");
             for (int i = 0; i < screenShots.Length; i++)
             {
+                theUFSession.Ui.SetStatus("Generating ScreenShot " + screenShots[i].FileName);
                 theLW.WriteFullline("File name: " + screenShots[i].FileName + "; Template name: " + screenShots[i].TemplateName + "; Group name: " + screenShots[i].GroupName + 
                                     "; Camera name: " + screenShots[i].CameraName + "; Solution name: " + screenShots[i].Solution + "; Subcase: " + screenShots[i].Subcase.ToString() + 
                                     "; Iteration: " + screenShots[i].Iteration + "; Result type: " + screenShots[i].ResultType + "; Component name " + screenShots[i].ComponentName + 
@@ -167,6 +177,10 @@ namespace TheScriptingEngineerScreenShotCreator
                 if (i != 0)
                 {
                     if (screenShots[i].TemplateName != screenShots[i - 1].TemplateName || screenShots[i].Solution != screenShots[i - 1].Solution)
+                    {
+                        SetPostTemplate(postViewId, screenShots[i].TemplateName);
+                    }
+                    else
                     {
                         SetPostTemplate(postViewId, screenShots[i].TemplateName);
                     }
@@ -227,8 +241,8 @@ namespace TheScriptingEngineerScreenShotCreator
             // TODO: add options for file formats other than .tiff
             // check if fileName contains a path. If not save with the .sim file
             string filePathWithoutExtension = CreateFullPath(fileName, ""); // should be in line with imageExportBuilder.FileFormat
-            // ChangeExtension leavs a dot at the end when changing with empty string.
-            filePathWithoutExtension = Path.ChangeExtension(filePathWithoutExtension, "").Substring(0, filePathWithoutExtension.Length);
+            // Get full path without extension
+            filePathWithoutExtension = Path.ChangeExtension(filePathWithoutExtension, null);
 
             // delete existing file to mimic overwriting
             string filePath = filePathWithoutExtension + ".tif";
@@ -352,23 +366,6 @@ namespace TheScriptingEngineerScreenShotCreator
             int postViewId = theSession.Post.CreatePostviewForResult(0, solutionResult, false, resultParameters);
 
             return postViewId;
-
-            // // Check if the result has been displayed
-            // if (postViewId != null)
-            // {
-            //     // Display the active result object
-            //     theUI.ResultViewManager.Show(activeResult);
-
-            //     // Get the active result view
-            //     ResultView activeView = theUI.ResultViewManager.GetActiveView();
-
-            //     return activeView;
-            // }
-            // else
-            // {
-            //     // Display an error message if an active result object does not exist
-            //     theLW.WriteFullline("Error: No active result object found");
-            // }
         }
 
 
@@ -401,7 +398,6 @@ namespace TheScriptingEngineerScreenShotCreator
         /// </remarks>
         public static void SetPostTemplate(int postViewId, string templateName)
         {
-            //TODO: =check if template has been found.
             int templateId = theSession.Post.TemplateSearch(templateName);
             theSession.Post.PostviewApplyTemplate(postViewId, templateId);
         }
@@ -437,11 +433,13 @@ namespace TheScriptingEngineerScreenShotCreator
             // int[] userGroupIds = new int[1];
             // // This creates a "PostGroup"
             // userGroupIds[0] = theSession.Post.CreateUserGroupFromEntityLabels(postViewId, CaeGroupCollection.EntityType.Element, groupElementLabels);
+            // theSession.Post.PostviewApplyUserGroupVisibility(postViewId, usergroupsGids, NXOpen.CAE.Post.GroupVisibility.ShowOnly);
 
-            int[] usergroupsGids;
-            string[] userGroupNames = new string[] {groupName};
+
             // only since NX11 although user reported a bug in this function in NX11 
             // Use commented code above for versions before NX11
+            int[] usergroupsGids;
+            string[] userGroupNames = new string[] {groupName};
             theSession.Post.PostviewGetUserGroupGids(postViewId, userGroupNames, out usergroupsGids); 
             theSession.Post.PostviewApplyUserGroupVisibility(postViewId, usergroupsGids, NXOpen.CAE.Post.GroupVisibility.ShowOnly);
         }
@@ -727,7 +725,6 @@ namespace TheScriptingEngineerScreenShotCreator
                 try
                 {
                     theSession.Post.TemplateSearch(screenShot.TemplateName);
-                    theLW.WriteFullline("Template with name " + screenShot.TemplateName + " could not be found.");
                 }
                 catch
                 {
