@@ -86,8 +86,6 @@ namespace TheScriptingEngineerScreenShotCreator
                 return;
             }
 
-            string filePath; // = "/home/frederik/theScriptingEngineer/NXOpen/CodeSnippets/ScreenShotsInput.json";
-
             // https://docs.microsoft.com/en-us/dotnet/api/system.windows.forms.openfiledialog?view=netframework-4.8
             using (System.Windows.Forms.OpenFileDialog openFileDialog = new OpenFileDialog())
             {
