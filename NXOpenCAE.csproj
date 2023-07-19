@@ -37,4 +37,13 @@
     </Reference>
   </ItemGroup> -->
 
+  <ItemGroup>
+    <Reference Include="System.Windows.Forms">
+      <HintPath>..\dlls\System.Windows.Forms.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Drawing">
+      <HintPath>..\dlls\System.Drawing.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
 </Project>
