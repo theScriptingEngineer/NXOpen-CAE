@@ -34,7 +34,7 @@
 //    - <Result>[Displacement][Nodal]</Result>
 //    - <Component>Magnitude</Component>
 
-//  It is advised to update the group visibility with the following (assuming there are less than 1000 groups in the model).
+//  Update the group visibility with the following (assuming there are less than 1000 groups in the model).
 //  Note that other types might exist (like <Num3DGroups>). Adjust accordingly.
 //		<GroupVisibilities>
 //			<Num1DGroups>1000</Num1DGroups>
@@ -48,6 +48,11 @@
 //  This can be found in the log file.
 //  If you also set UGII_CAE_POST_TEMPLATE_EDITOR to for example notepad++.exe,
 //  you can directly edit by right-clicking the template in the NX GUI
+
+// Tested in 
+// - NX12
+// - Simcenter3D release 2022.1 (version 2206)
+// - Simcenter3D 2212
 
 namespace TheScriptingEngineerScreenShotCreator
 {
@@ -68,6 +73,7 @@ namespace TheScriptingEngineerScreenShotCreator
         public static Session theSession = Session.GetSession();
         public static UFSession theUFSession = UFSession.GetUFSession();
         public static ListingWindow theLW = theSession.ListingWindow;
+        public static string nXVersion = theSession.GetEnvironmentVariableValue("UGII_VERSION"); // theSession.BuildNumber only available from version 1926 onwards
 
         public static void Main(string[] args)
         {
@@ -139,12 +145,17 @@ namespace TheScriptingEngineerScreenShotCreator
             // load all results before the loop
             SolutionResult[] solutionResults = LoadResults(screenShots);
 
-            // turn off antialiasing for sharper edges
-            UI theUI = UI.GetUI();
-            bool originalLineAntialiasing = theUI.VisualizationVisualPreferences.LineAntialiasing;
-            bool originalFullSceneAntialiasing = theUI.VisualizationVisualPreferences.FullSceneAntialiasing;
-            theUI.VisualizationVisualPreferences.LineAntialiasing = false;
-            theUI.VisualizationVisualPreferences.FullSceneAntialiasing = false;
+            // Keep track of all original CaeGroups, so the (possible) Created PostGroups can be tracked and deleted
+            // Without accidentaly deleting user groups which might start with PostGroup.
+            SimPart simPart = (SimPart)theSession.Parts.BaseWork;
+            CaeGroup[] caeGroupsOriginal = simPart.CaeGroups.ToArray();
+
+            // // turn off antialiasing for sharper edges
+            // UI theUI = UI.GetUI();
+            // bool originalLineAntialiasing = theUI.VisualizationVisualPreferences.LineAntialiasing;
+            // bool originalFullSceneAntialiasing = theUI.VisualizationVisualPreferences.FullSceneAntialiasing;
+            // theUI.VisualizationVisualPreferences.LineAntialiasing = false;
+            // theUI.VisualizationVisualPreferences.FullSceneAntialiasing = false;
 
             int postViewId = -1;
             // process the screen shots
@@ -218,13 +229,18 @@ namespace TheScriptingEngineerScreenShotCreator
                 {
                     postAnnotation.Delete();
                 }
-
-                // Delete post group
-                // DeletePostGroups();
             }
 
-            theUI.VisualizationVisualPreferences.LineAntialiasing = originalLineAntialiasing;
-            theUI.VisualizationVisualPreferences.FullSceneAntialiasing = originalFullSceneAntialiasing;
+            // Clean up post groups
+            CaeGroup[] caeGroups = simPart.CaeGroups.ToArray();
+            if (caeGroups.Length != caeGroupsOriginal.Length)
+            {
+                theLW.WriteFullline("Removing automatically created PostGroups");
+                DeletePostGroups(caeGroups, caeGroupsOriginal);
+            }
+
+            // theUI.VisualizationVisualPreferences.LineAntialiasing = originalLineAntialiasing;
+            // theUI.VisualizationVisualPreferences.FullSceneAntialiasing = originalFullSceneAntialiasing;
             PrintMessage();
         }
 
@@ -272,26 +288,6 @@ namespace TheScriptingEngineerScreenShotCreator
             {
                 imageExportBuilder.Destroy();
             }
-
-            // using studioImageCaptureBuilder (untested)
-            // SimPart simPart = (SimPart)theSession.Parts.BaseWork;
-            // NXOpen.Display.StudioImageCaptureBuilder studioImageCaptureBuilder = simPart.Views.CreateStudioImageCaptureBuilder();
-            // try
-            // {
-            // // studioImageCaptureBuilder.NativeFileBrowser = fileLocation;
-            // // studioImageCaptureBuilder.DpiEnum = NXOpen.Display.StudioImageCaptureBuilder.DPIEnumType.Dpi150;
-            // // studioImageCaptureBuilder.AASamplesEnum = NXOpen.Display.StudioImageCaptureBuilder.AASamplesEnumType.Sam0X;
-            // // //studioImageCaptureBuilder.EnhanceEdges = false;
-            // // studioImageCaptureBuilder.Commit();
-            // }
-            // catch (Exception ex)
-            // {
-            //     theLW.WriteFullline(ex.Message);
-            // }
-            // finally
-            // {
-            //     studioImageCaptureBuilder.Destroy();
-            // }
         }
 
         /// <summary>
@@ -408,54 +404,80 @@ namespace TheScriptingEngineerScreenShotCreator
         /// </summary>
         /// <param name="postViewId">The ID of the post view to set the group visibility for.</param>
         /// <param name="groupName">The name of the group to show.</param>
-        /// <remarks>
-        /// This method only works for NX12 and later versions, as the group label was only introduced in NX12.
-        /// </remarks>
         public static void DisplayElementsInGroup(int postViewId, string groupName)
         {
-            // NX creates it's own postgroups from the groups in the sim.
-            // It only creates a postgroup if either nodes or elements are present in the group.
-            // Therefore it's hard to relate the postgroup labels to the group labels in the simfile...
-            // SimPart simPart = (SimPart)theSession.Parts.BaseWork;
-            // CaeGroup[] caeGroups = simPart.CaeGroups.ToArray();
-            // CaeGroup caeGroup = Array.Find(caeGroups, group => group.Name.ToLower() == groupName.ToLower());
+            if (nXVersion == "v12")
+            {
+                DisplayElementsInGroupViaPostGroup(postViewId, groupName);
+            }
+            else
+            {
+                int[] usergroupsGids;
+                string[] userGroupNames = new string[] {groupName};
+                // the next function only works for Groups created in the .sim file (at least when used like this)
+                // not for groups inherited from the fem or afem file.
+                // therefore a workaround with a postgroup for these fem or afem groups
+                theSession.Post.PostviewGetUserGroupGids(postViewId, userGroupNames, out usergroupsGids);
+                if (usergroupsGids.Length == 0)
+                {
+                    // theLW.WriteFullline("Warning: group " + groupName + " is not a sim groups and is displayed through a temporaty PostGroup");
+                    DisplayElementsInGroupViaPostGroup(postViewId, groupName);
+                }
+                else
+                {
+                    theSession.Post.PostviewApplyUserGroupVisibility(postViewId, usergroupsGids, NXOpen.CAE.Post.GroupVisibility.ShowOnly);
+                }
+            }
+        }
 
-            // TaggedObject[] groupItems = caeGroup.GetEntities();
-            // int[] groupElementLabels = new int[groupItems.Length];
-            // for (int i = 0; i < groupItems.Length; i++)
-            // {
-            //     if (groupItems[i] is FEElement)
-            //     {
-            //         groupElementLabels[i] = ((FEElement)groupItems[i]).Label;
-            //     }
-            // }
+        /// <summary>
+        /// Helper function for DisplayElementsInGroup.
+        /// This function creates an "on the fly" postgroup which is then used to display a specific group.
+        /// </summary>
+        /// <param name="postViewId">The ID of the post view to set the group visibility for.</param>
+        /// <param name="groupName">The name of the group to show.</param>
+        /// <remarks>
+        /// It is the responsibility of the user to delete the PostGroups which are automatically created here.
+        /// </remarks>
+        public static void DisplayElementsInGroupViaPostGroup(int postViewId, string groupName)
+        {
+                // NX creates it's own postgroups from the groups in the sim.
+                // It only creates a postgroup if either nodes or elements are present in the group.
+                // Therefore it's hard to relate the postgroup labels to the group labels in the simfile...
+                SimPart simPart = (SimPart)theSession.Parts.BaseWork;
+                CaeGroup[] caeGroups = simPart.CaeGroups.ToArray();
+                CaeGroup caeGroup = Array.Find(caeGroups, group => group.Name.ToLower() == groupName.ToLower());
 
-            // int[] userGroupIds = new int[1];
-            // // This creates a "PostGroup"
-            // userGroupIds[0] = theSession.Post.CreateUserGroupFromEntityLabels(postViewId, CaeGroupCollection.EntityType.Element, groupElementLabels);
-            // theSession.Post.PostviewApplyUserGroupVisibility(postViewId, usergroupsGids, NXOpen.CAE.Post.GroupVisibility.ShowOnly);
+                TaggedObject[] groupItems = caeGroup.GetEntities();
+                // one longer, otherwise a single element is missing from each screenshot (bug in NX)
+                int[] groupElementLabels = new int[groupItems.Length + 1];
+                groupElementLabels[0] = 0;
+                for (int i = 0; i < groupItems.Length; i++)
+                {
+                    if (groupItems[i] is FEElement)
+                    {
+                        groupElementLabels[i + 1] = ((FEElement)groupItems[i]).Label;
+                    }
+                }
 
-
-            // only since NX11 although user reported a bug in this function in NX11 
-            // Use commented code above for versions before NX11
-            int[] usergroupsGids;
-            string[] userGroupNames = new string[] {groupName};
-            theSession.Post.PostviewGetUserGroupGids(postViewId, userGroupNames, out usergroupsGids); 
-            theSession.Post.PostviewApplyUserGroupVisibility(postViewId, usergroupsGids, NXOpen.CAE.Post.GroupVisibility.ShowOnly);
+                int[] userGroupIds = new int[1];
+                // This creates a "PostGroup"
+                userGroupIds[0] = theSession.Post.CreateUserGroupFromEntityLabels(postViewId, CaeGroupCollection.EntityType.Element, groupElementLabels);
+                theSession.Post.PostviewApplyUserGroupVisibility(postViewId, userGroupIds, NXOpen.CAE.Post.GroupVisibility.ShowOnly);
         }
 
         /// <summary>
         /// Delete all PostGroups created earlier
+        /// If a user creates a group which contains "PostGroup", then it will also be deleted.
         /// </summary>
-        public static void DeletePostGroups()
+        public static void DeletePostGroups(CaeGroup[] caeGroups, CaeGroup[] caeGroupsOriginal)
         {
-            SimPart simPart = (SimPart)theSession.Parts.BaseWork;
-            CaeGroup[] caeGroups = simPart.CaeGroups.ToArray();
-            CaeGroup[] postGroup = Array.FindAll(caeGroups, group => group.Name.ToLower() == "postgroup");
-
-            foreach (CaeGroup group in postGroup)
+            foreach(NXOpen.CAE.CaeGroup group in caeGroups)
             {
-                theSession.UpdateManager.AddToDeleteList((NXObject)group);
+                if(!Array.Exists(caeGroupsOriginal, item => item.Name == group.Name))
+                {
+                    theSession.UpdateManager.AddToDeleteList((NXObject)group);
+                }
             }
             
             Session.UndoMarkId undoMarkId = theSession.SetUndoMark(Session.MarkVisibility.Invisible, "deletePostGroup");
