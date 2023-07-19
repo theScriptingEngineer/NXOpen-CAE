@@ -4,6 +4,9 @@
 # No SimCenter dll's because of copyright
 NXOpen*.dll
 
+# No windows dlls, just for intellisense
+*.dll
+
 # Build results
 [Bb]in/
 [Oo]bj/

@@ -150,13 +150,6 @@ namespace TheScriptingEngineerScreenShotCreator
             SimPart simPart = (SimPart)theSession.Parts.BaseWork;
             CaeGroup[] caeGroupsOriginal = simPart.CaeGroups.ToArray();
 
-            // // turn off antialiasing for sharper edges
-            // UI theUI = UI.GetUI();
-            // bool originalLineAntialiasing = theUI.VisualizationVisualPreferences.LineAntialiasing;
-            // bool originalFullSceneAntialiasing = theUI.VisualizationVisualPreferences.FullSceneAntialiasing;
-            // theUI.VisualizationVisualPreferences.LineAntialiasing = false;
-            // theUI.VisualizationVisualPreferences.FullSceneAntialiasing = false;
-
             int postViewId = -1;
             // process the screen shots
             theLW.WriteFullline("Generated " + screenShots.Length + " screenshots with the following input:");
@@ -235,12 +228,10 @@ namespace TheScriptingEngineerScreenShotCreator
             CaeGroup[] caeGroups = simPart.CaeGroups.ToArray();
             if (caeGroups.Length != caeGroupsOriginal.Length)
             {
-                theLW.WriteFullline("Removing automatically created PostGroups");
                 DeletePostGroups(caeGroups, caeGroupsOriginal);
+                theLW.WriteFullline("Removed automatically created PostGroups");
             }
 
-            // theUI.VisualizationVisualPreferences.LineAntialiasing = originalLineAntialiasing;
-            // theUI.VisualizationVisualPreferences.FullSceneAntialiasing = originalFullSceneAntialiasing;
             PrintMessage();
         }
 
@@ -414,9 +405,9 @@ namespace TheScriptingEngineerScreenShotCreator
             {
                 int[] usergroupsGids;
                 string[] userGroupNames = new string[] {groupName};
-                // the next function only works for Groups created in the .sim file (at least when used like this)
-                // not for groups inherited from the fem or afem file.
-                // therefore a workaround with a postgroup for these fem or afem groups
+                // The next function only works for Groups created in the .sim file (at least when used like this)
+                // And not for groups inherited from the fem or afem file. Also using the JournalIdentifier did not work.
+                // Therefore a workaround with a postgroup for these fem or afem groups.
                 theSession.Post.PostviewGetUserGroupGids(postViewId, userGroupNames, out usergroupsGids);
                 if (usergroupsGids.Length == 0)
                 {
