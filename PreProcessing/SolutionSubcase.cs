@@ -536,7 +536,7 @@
                     {
                         try
                         {
-                            outputRequestPropertyTable = simPart.ModelingObjectPropertyTables.CreateModelingObjectPropertyTable("Structural Output Requests", "NX NASTRAN - Structural", "NX NASTRAN", "Structural Output Requests1", 1001);
+                            outputRequestPropertyTable = simPart.ModelingObjectPropertyTables.CreateModelingObjectPropertyTable("Structural Output Requests", "NX NASTRAN - Structural", "NX NASTRAN", "Structural Output Requests1", label);
                         }
                         catch (System.Exception)
                         {

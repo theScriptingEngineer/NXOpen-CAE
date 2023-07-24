@@ -49,9 +49,9 @@
 //  If you also set UGII_CAE_POST_TEMPLATE_EDITOR to for example notepad++.exe,
 //  you can directly edit by right-clicking the template in the NX GUI
 
-// Tested in 
+// Tested in:
 // - NX12
-// - Simcenter3D release 2022.1 (version 2206)
+// - Simcenter3D release 2022.1 (version 2023)
 // - Simcenter3D 2212
 
 namespace TheScriptingEngineerScreenShotCreator
@@ -85,8 +85,6 @@ namespace TheScriptingEngineerScreenShotCreator
                 theLW.WriteFullline("ScreenShotCreator needs to be started from a .sim file!");
                 return;
             }
-
-            string filePath; // = "/home/frederik/theScriptingEngineer/NXOpen/CodeSnippets/ScreenShotsInput.json";
 
             // https://docs.microsoft.com/en-us/dotnet/api/system.windows.forms.openfiledialog?view=netframework-4.8
             using (System.Windows.Forms.OpenFileDialog openFileDialog = new OpenFileDialog())
