@@ -86,6 +86,7 @@ namespace TheScriptingEngineerScreenShotCreator
                 return;
             }
 
+            string filePath = "";
             // https://docs.microsoft.com/en-us/dotnet/api/system.windows.forms.openfiledialog?view=netframework-4.8
             using (System.Windows.Forms.OpenFileDialog openFileDialog = new OpenFileDialog())
             {
@@ -694,6 +695,11 @@ namespace TheScriptingEngineerScreenShotCreator
                 {
                     theLW.WriteFullline("Error in input " + item.ToString());
                     theLW.WriteFullline("ResultType " + item.ResultType + "not found in iteration number " + item.Iteration.ToString() + " in SubCase with number " + item.Subcase.ToString() + " in solution with name " + item.Solution);
+                    theLW.WriteFullline("The options for result type are:");
+                    foreach (BaseResultType option in baseResultTypes)
+                    {
+                        theLW.WriteFullline(option.Name);
+                    }
                     throw new ArgumentException("ResultType " + item.ResultType + "not found in iteration number " + item.Iteration.ToString() + " in SubCase with number " + item.Subcase.ToString() + " in solution with name " + item.Solution);
                 }
             }
