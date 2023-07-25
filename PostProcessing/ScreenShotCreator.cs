@@ -489,7 +489,7 @@ namespace TheScriptingEngineerScreenShotCreator
             NXOpen.CAE.PostAnnotationBuilder postAnnotationBuilder = theSession.Post.CreateAnnotationBuilder(postViewId);
             postAnnotationBuilder.SetName("AnnotationName");
             postAnnotationBuilder.SetAnnotationType(NXOpen.CAE.PostAnnotationBuilder.Type.Userloc);
-            postAnnotationBuilder.SetCoordinate(0.3, 0.15);
+            postAnnotationBuilder.SetCoordinate(0.5, 0.05);
 
             string[] userText = new string[1];
             userText[0] = annotationText;

@@ -10,7 +10,7 @@
     using NXOpen.Utilities;
     using NXOpen.VectorArithmetic;
     
-    public class AddRelatedNodesAndElements
+    public class RelatedNodesAndElements
     {
         // global variables used throughout
         public static Session theSession = Session.GetSession();
@@ -28,7 +28,7 @@
                 return;
             }
 
-            AddRelatedNodesAndElements(femPart);
+            AddRelatedNodesAndElements((CaePart)basePart);
         }
 
         /// <summary>
