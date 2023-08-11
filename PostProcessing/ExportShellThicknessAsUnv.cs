@@ -54,7 +54,32 @@ namespace TheScriptingEngineer
                 return;
             }
 
-            WriteThicknessResults(baseFemPart, "Thickness.unv");
+            bool sIUnits = false;
+            if (!(theSession.IsBatch))
+            {
+                string inputString = NXOpenUI.NXInputBox.GetInputString("Export in SI units? (yes or no)", "Please select units", "yes");
+                if (inputString == "")
+                {
+                    // user pressed cancel
+                    return;
+                }
+                else if (inputString.Trim().ToLower() == "yes")
+                {
+                    sIUnits = true;
+                }
+                else if (inputString.Trim().ToLower() == "no")
+                {
+                    sIUnits = false;
+                }
+                else
+                {
+                    UI theUI = NXOpen.UI.GetUI();
+                    int error = theUI.NXMessageBox.Show("Export shell thickness as universal file", NXMessageBox.DialogType.Error, "Please type yes or no");
+                    return;
+                }
+            }
+
+            WriteThicknessResults(baseFemPart, "Thickness.unv", sIUnits);
 
             // return to original work part.
             theSession.Parts.SetWork(basePart);
