@@ -54,7 +54,32 @@ namespace TheScriptingEngineer
                 return;
             }
 
-            WriteThicknessResults(baseFemPart, "Thickness.unv");
+            bool sIUnits = false;
+            if (!(theSession.IsBatch))
+            {
+                string inputString = NXOpenUI.NXInputBox.GetInputString("Export in SI units? (yes or no)", "Please select units", "yes");
+                if (inputString == "")
+                {
+                    // user pressed cancel
+                    return;
+                }
+                else if (inputString.Trim().ToLower() == "yes")
+                {
+                    sIUnits = true;
+                }
+                else if (inputString.Trim().ToLower() == "no")
+                {
+                    sIUnits = false;
+                }
+                else
+                {
+                    UI theUI = NXOpen.UI.GetUI();
+                    int error = theUI.NXMessageBox.Show("Export shell thickness as universal file", NXMessageBox.DialogType.Error, "Please type yes or no");
+                    return;
+                }
+            }
+
+            WriteThicknessResults(baseFemPart, "Thickness.unv", sIUnits);
 
             // return to original work part.
             theSession.Parts.SetWork(basePart);
@@ -66,9 +91,9 @@ namespace TheScriptingEngineer
         /// </summary>
         /// <param name="baseFemPart">The BaseFemPart to generate the thickness result for.</param>
         /// <param name="fileName">The name of the universal file to write the results to</param>
-        public static void WriteThicknessResults(BaseFemPart baseFemPart, string fileName)
+        public static void WriteThicknessResults(BaseFemPart baseFemPart, string fileName, bool sIUnits = true)
         {
-            string[] datasets = CreateThicknessDatasets(baseFemPart);
+            string[] datasets = CreateThicknessDatasets(baseFemPart, sIUnits);
             fileName = CreateFullPath(fileName);
 
             // concatenate all datasets
@@ -77,7 +102,7 @@ namespace TheScriptingEngineer
             File.WriteAllText(fileName, unvFile);
         }
 
-        public static string[] CreateThicknessDatasets(BaseFemPart baseFemPart)
+        public static string[] CreateThicknessDatasets(BaseFemPart baseFemPart, bool sIUnits)
         {
             theLW.WriteFullline("---------- WARNING ----------");
             theLW.WriteFullline("The Element-Nodal result Record 14 field 2 is set to 2: ");
@@ -94,8 +119,8 @@ namespace TheScriptingEngineer
             {
                 if (item.Value.Shape.ToString() == "Quad" || item.Value.Shape.ToString() == "Tri")
                 {
-                    thicknessDatasetElemental = thicknessDatasetElemental + CreateThicknessRecords(baseFemPart, item.Value)[0];
-                    thicknessDatasetElementNodal = thicknessDatasetElementNodal + CreateThicknessRecords(baseFemPart, item.Value)[1];
+                    thicknessDatasetElemental = thicknessDatasetElemental + CreateThicknessRecords(baseFemPart, item.Value, sIUnits)[0];
+                    thicknessDatasetElementNodal = thicknessDatasetElementNodal + CreateThicknessRecords(baseFemPart, item.Value, sIUnits)[1];
                 }
             }
 
@@ -107,13 +132,12 @@ namespace TheScriptingEngineer
         }
 
         /// <summary>
-        /// This function returns a representation of the Results used in PostInputs.
-        /// Note that the representation is taken from the SolutionResult and not the SimSolution!
+        /// This function generates result records where the result is a shell element thickness.
         /// </summary>
         /// <param name="baseFemPart">The BaseFemPart to generate the thickness datasets for.</param>
         /// <param name="fEElement">The FEElement for which to generate to thickness records for.</param>
         /// <returns>An array with the elemental and element-nodal record for the given FEElement.</returns>
-        public static string[] CreateThicknessRecords(BaseFemPart baseFemPart, FEElement fEElement)
+        public static string[] CreateThicknessRecords(BaseFemPart baseFemPart, FEElement fEElement, bool sIUnits)
         {
             // user feedback, but not for all, otherwise some performance hit.
             if (fEElement.Label % 1000 == 0)
@@ -124,6 +148,8 @@ namespace TheScriptingEngineer
             double thickness = -1;
             Unit thicknessUnit;
             fEElement.Mesh.MeshCollector.ElementPropertyTable.GetNamedPropertyTablePropertyValue("Shell Property").PropertyTable.GetScalarWithDataPropertyValue("element thickness", out thickness, out thicknessUnit);
+
+            if (sIUnits) {thickness = thickness / 1000;}
 
             string Record14Elemental = String.Format("{0, 10}", fEElement.Label) + String.Format("{0, 10}", "1") + Environment.NewLine;
             string Record15Elemental = String.Format("{0, 13}", thickness) + Environment.NewLine;
@@ -173,12 +199,13 @@ namespace TheScriptingEngineer
                     }
                     else
                     {
-                        Record15ElementNodal = Record15ElementNodal + String.Format("{0, 13}", String.Format("{0:#.#####E+00}", item));
+                        Double value = item;
+                        if (sIUnits) {value = item / 1000;}
+                        Record15ElementNodal = Record15ElementNodal + String.Format("{0, 13}", String.Format("{0:#.#####E+00}", value));
                     }
                     
                 }
             }
-
 
             Record15ElementNodal = Record15ElementNodal + Environment.NewLine;
 

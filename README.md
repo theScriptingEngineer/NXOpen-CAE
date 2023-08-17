@@ -1,6 +1,6 @@
 # NXOpen-CAE
 
-This is a repository with NXOpen code for Siemens SimCenter 3D (aka NX CAE) in C#.
+This is a repository with NXOpen code for Siemens SimCenter 3D (aka NX CAE) in C#
 If you’re using my scripts in your daily work, saving you a lot of work and time, buy me a coffe so I can continue developing awesome scripts.
 [Buy me a coffe](https://www.buymeacoffee.com/theScriptingEngineer)
 

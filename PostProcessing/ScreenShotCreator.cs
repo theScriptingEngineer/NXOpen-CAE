@@ -49,9 +49,9 @@
 //  If you also set UGII_CAE_POST_TEMPLATE_EDITOR to for example notepad++.exe,
 //  you can directly edit by right-clicking the template in the NX GUI
 
-// Tested in 
+// Tested in:
 // - NX12
-// - Simcenter3D release 2022.1 (version 2206)
+// - Simcenter3D release 2022.1 (version 2023)
 // - Simcenter3D 2212
 
 namespace TheScriptingEngineerScreenShotCreator
@@ -85,6 +85,8 @@ namespace TheScriptingEngineerScreenShotCreator
                 theLW.WriteFullline("ScreenShotCreator needs to be started from a .sim file!");
                 return;
             }
+
+            string filePath = "";
 
             // https://docs.microsoft.com/en-us/dotnet/api/system.windows.forms.openfiledialog?view=netframework-4.8
             using (System.Windows.Forms.OpenFileDialog openFileDialog = new OpenFileDialog())
@@ -488,7 +490,7 @@ namespace TheScriptingEngineerScreenShotCreator
             NXOpen.CAE.PostAnnotationBuilder postAnnotationBuilder = theSession.Post.CreateAnnotationBuilder(postViewId);
             postAnnotationBuilder.SetName("AnnotationName");
             postAnnotationBuilder.SetAnnotationType(NXOpen.CAE.PostAnnotationBuilder.Type.Userloc);
-            postAnnotationBuilder.SetCoordinate(0.3, 0.15);
+            postAnnotationBuilder.SetCoordinate(0.5, 0.05);
 
             string[] userText = new string[1];
             userText[0] = annotationText;
@@ -694,6 +696,11 @@ namespace TheScriptingEngineerScreenShotCreator
                 {
                     theLW.WriteFullline("Error in input " + item.ToString());
                     theLW.WriteFullline("ResultType " + item.ResultType + "not found in iteration number " + item.Iteration.ToString() + " in SubCase with number " + item.Subcase.ToString() + " in solution with name " + item.Solution);
+                    theLW.WriteFullline("The options for result type are:");
+                    foreach (BaseResultType option in baseResultTypes)
+                    {
+                        theLW.WriteFullline(option.Name);
+                    }
                     throw new ArgumentException("ResultType " + item.ResultType + "not found in iteration number " + item.Iteration.ToString() + " in SubCase with number " + item.Subcase.ToString() + " in solution with name " + item.Solution);
                 }
             }
