@@ -772,6 +772,11 @@
                 {
                     theLW.WriteFullline("Error in input " + item.ToString());
                     theLW.WriteFullline("ResultType " + item.ResultType + "not found in iteration number " + item.Iteration.ToString() + " in SubCase with number " + item.Subcase.ToString() + " in solution with name " + item.Solution);
+                    theLW.WriteFullline("Available result types are:");
+                    foreach (BaseResultType baseResultType in baseResultTypes)
+                    {
+                        theLW.WriteFullline(baseResultType.UserName);
+                    }
                     throw new ArgumentException("ResultType " + item.ResultType + "not found in iteration number " + item.Iteration.ToString() + " in SubCase with number " + item.Subcase.ToString() + " in solution with name " + item.Solution);
                 }
             }
