@@ -27,21 +27,75 @@ namespace TheScriptingEngineer
 
         }
 
-
+        /// <summary>
+        /// Retrieves and prints nodal values for a specified node label.
+        /// Currently hard coded for a nodal result with X,Y,Z and Magnitude as components
+        /// </summary>
+        /// <param name="solutionName">Name of the solution.</param>
+        /// <param name="subcase">Subcase number.</param>
+        /// <param name="iteration">Iteration number.</param>
+        /// <param name="resultType">Type of result.</param>
+        /// <param name="nodeLabel">Label of the node.</param>
         public static void ListNodalValues(string solutionName, int subcase, int iteration, string resultType, int nodeLabel)
         {
-          PostInput postInput = new PostInput(solutionName, subcase, iteration, resultType); // Note that the user starts counting at 1!
-          PostInput[] postInputArray = new PostInput[] { postInput };
-          SolutionResult[] solutionResults = LoadResults(postInputArray);
-          Result result = (Result)solutionResults[0];
-          ResultType[] resultTypes = GetResultTypes(postInputArray, solutionResults);
-          ResultParameters[] resultParameters = GetResultParamaters(resultTypes, Result.ShellSection.Maximum, Result.Component.Magnitude, false);
-          ResultAccess resultAccess = theSession.ResultManager.CreateResultAccess(result, resultParameters[0]);
-          Double[] nodalData = null;
-          resultAccess.AskNodalResultAllComponents(solutionResults[0].AskNodeIndex(nodeLabel), out nodalData);
-          theLW.WriteFullline("X:\t" + nodalData[0].ToString() + "\tY:\t" + nodalData[1].ToString() + "\tZ:\t" + nodalData[2].ToString() + "\tMagnitude:\t" + nodalData[3].ToString());
+            PostInput postInput = new PostInput(solutionName, subcase, iteration, resultType); // Note that the user starts counting at 1!
+            PostInput[] postInputArray = new PostInput[] { postInput };
+            SolutionResult[] solutionResults = LoadResults(postInputArray);
+            Result result = (Result)solutionResults[0];
+            ResultType[] resultTypes = GetResultTypes(postInputArray, solutionResults);
+            ResultParameters[] resultParameters = GetResultParamaters(resultTypes, Result.ShellSection.Maximum, Result.Component.Magnitude, false);
+            ResultAccess resultAccess = theSession.ResultManager.CreateResultAccess(result, resultParameters[0]);
+            resultAccess.AskNodalResultAllComponents(solutionResults[0].AskNodeIndex(nodeLabel), out double[] nodalData);
+            // printing is hard coded as X Y Z Magnitude
+            theLW.WriteFullline("X:\t" + nodalData[0].ToString() + "\tY:\t" + nodalData[1].ToString() + "\tZ:\t" + nodalData[2].ToString() + "\tMagnitude:\t" + nodalData[3].ToString());
+        }
 
+        /// <summary>
+        /// Retrieves and prints Element-Nodal values for a specified element label.
+        /// Currently hard coded for Beam resultants forces with 2 nodes and 6 components per node.
+        /// </summary>
+        /// <param name="solutionName">Name of the solution.</param>
+        /// <param name="subcase">Subcase number.</param>
+        /// <param name="iteration">Iteration number.</param>
+        /// <param name="resultType">Type of result.</param>
+        /// <param name="elementLabel">Label of the element to list the Element-Nodal results for.</param>
+        public static void ListElementNodalValues(string solutionName, int subcase, int iteration, string resultType, int elementLabel)
+        {
+            PostInput postInput = new PostInput(solutionName, subcase, iteration, resultType); // Note that the user starts counting at 1!
+            PostInput[] postInputArray = new PostInput[] { postInput };
+            SolutionResult[] solutionResults = LoadResults(postInputArray);
+            Result result = (Result)solutionResults[0];
+            ResultType[] resultTypes = GetResultTypes(postInputArray, solutionResults);
+            ResultParameters[] resultParameters = GetResultParamaters(resultTypes, Result.ShellSection.Maximum, Result.Component.Axial, false);
+            ResultAccess resultAccess = theSession.ResultManager.CreateResultAccess(result, resultParameters[0]);
+            resultAccess.AskElementNodalResultAllComponents(solutionResults[0].AskElementIndex(elementLabel), out int[] nodeIndex, out int numComponents, out double[] elementNodalData);
+            //   for (int i = 0; i < nodeIndex.Length; i++)
+            //   {
+            //     theLW.WriteFullline("Results for node " + solutionResults[0].AskNodeLabel(nodeIndex[i]));
+            //     for (int j = 0; j < numComponents; j++)
+            //     {
+            //         theLW.WriteFullline("Value: " + elementNodalData[i * numComponents + j]);
+            //     }
+            //   }
 
+            // printing is hard coded as beam resultant forces
+            // String.Format("{0, 13}", String.Format("{0:#.#####E+00}", elementNodalData[0]) for scientific notation, all with 13 length
+            // .PadRight(13) for left align (note the 13 in both)
+            theLW.WriteFullline(String.Format("{0, 13}", "ID:".PadRight(13)) + String.Format("{0, 13}", "Nxx:".PadRight(13)) + String.Format("{0, 13}", "Myy:".PadRight(13)) + String.Format("{0, 13}", "Mzz:".PadRight(13)) +String.Format("{0, 13}", "Mxx:".PadRight(13)) + String.Format("{0, 13}", "Qxy:".PadRight(13)) + String.Format("{0, 13}", "Qxz:".PadRight(13)));
+            theLW.WriteFullline(String.Format("{0, 13}", solutionResults[0].AskNodeLabel(nodeIndex[0]).ToString().PadRight(13)) +
+                                String.Format("{0, 13}", String.Format("{0:#.#####E+00}", elementNodalData[0]).PadRight(13)) +
+                                String.Format("{0, 13}", String.Format("{0:#.#####E+00}", elementNodalData[1]).PadRight(13)) +
+                                String.Format("{0, 13}", String.Format("{0:#.#####E+00}", elementNodalData[2]).PadRight(13)) +
+                                String.Format("{0, 13}", String.Format("{0:#.#####E+00}", elementNodalData[3]).PadRight(13)) +
+                                String.Format("{0, 13}", String.Format("{0:#.#####E+00}", elementNodalData[4]).PadRight(13)) +
+                                String.Format("{0, 13}", String.Format("{0:#.#####E+00}", elementNodalData[5]).PadRight(13)));
+            theLW.WriteFullline(String.Format("{0, 13}", solutionResults[0].AskNodeLabel(nodeIndex[1]).ToString().PadRight(13)) +
+                                String.Format("{0, 13}", String.Format("{0:#.#####E+00}", elementNodalData[6]).PadRight(13)) +
+                                String.Format("{0, 13}", String.Format("{0:#.#####E+00}", elementNodalData[7]).PadRight(13)) +
+                                String.Format("{0, 13}", String.Format("{0:#.#####E+00}", elementNodalData[8]).PadRight(13)) +
+                                String.Format("{0, 13}", String.Format("{0:#.#####E+00}", elementNodalData[9]).PadRight(13)) +
+                                String.Format("{0, 13}", String.Format("{0:#.#####E+00}", elementNodalData[10]).PadRight(13)) +
+                                String.Format("{0, 13}", String.Format("{0:#.#####E+00}", elementNodalData[11]).PadRight(13)));
         }
 
 

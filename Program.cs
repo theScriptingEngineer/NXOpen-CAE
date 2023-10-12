@@ -13,6 +13,7 @@
     {
         // global variables used throughout
         public static Session theSession = Session.GetSession();
+        public static UFSession theUFSession = UFSession.GetUFSession();
         public static ListingWindow theLW = theSession.ListingWindow;
         public static BasePart basePart = theSession.Parts.BaseWork;
 

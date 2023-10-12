@@ -54,7 +54,7 @@
 // - Simcenter3D release 2022.1 (version 2023)
 // - Simcenter3D 2212
 
-namespace TheScriptingEngineerScreenShotCreator
+namespace TheScriptingEngineer
 {
     using System;
     using System.IO; // for path operations
