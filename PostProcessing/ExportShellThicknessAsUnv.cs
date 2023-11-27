@@ -9,6 +9,10 @@
 // https://www.l3harrisgeospatial.com/docs/format_codes_fortran.html
 // https://help.perforce.com/pv-wave/2017.1/PVWAVE_Online_Help/pvwave.html#page/Foundation/ap.a.format.066.09.html
 
+// Need to improve performance:
+//  - Loop through the 2D meshes, get the related elements, so only one call to "GetNamedPropertyTablePropertyValue" -> no support for associated data though.
+
+
 namespace TheScriptingEngineer
 {
     using System;
