@@ -9,10 +9,6 @@
 // https://www.l3harrisgeospatial.com/docs/format_codes_fortran.html
 // https://help.perforce.com/pv-wave/2017.1/PVWAVE_Online_Help/pvwave.html#page/Foundation/ap.a.format.066.09.html
 
-// Need to improve performance:
-//  - Loop through the 2D meshes, get the related elements, so only one call to "GetNamedPropertyTablePropertyValue" -> no support for associated data though.
-
-
 namespace TheScriptingEngineer
 {
     using System;
@@ -44,7 +40,6 @@ namespace TheScriptingEngineer
                 baseFemPart = (BaseFemPart)simPart.FemPart;
 
                 // if the baseFemPart is an AssyFemPart then need to make it work for the code to run.
-                PartLoadStatus loadStatus;
                 theSession.Parts.SetWork(baseFemPart);
             }
             else if (basePart as BaseFemPart != null)
@@ -59,7 +54,7 @@ namespace TheScriptingEngineer
             }
 
             bool sIUnits = false;
-            if (!(theSession.IsBatch))
+            if (!theSession.IsBatch)
             {
                 string inputString = NXOpenUI.NXInputBox.GetInputString("Export in SI units? (yes or no)", "Please select units", "yes");
                 if (inputString == "")
@@ -78,9 +73,10 @@ namespace TheScriptingEngineer
                 else
                 {
                     UI theUI = NXOpen.UI.GetUI();
-                    int error = theUI.NXMessageBox.Show("Export shell thickness as universal file", NXMessageBox.DialogType.Error, "Please type yes or no");
+                    theUI.NXMessageBox.Show("Export shell thickness as universal file", NXMessageBox.DialogType.Error, "Please type yes or no");
                     return;
                 }
+
             }
 
             WriteThicknessResults(baseFemPart, "Thickness.unv", sIUnits);
@@ -95,18 +91,34 @@ namespace TheScriptingEngineer
         /// </summary>
         /// <param name="baseFemPart">The BaseFemPart to generate the thickness result for.</param>
         /// <param name="fileName">The name of the universal file to write the results to</param>
+        /// <param name="sIUnits">True divides thickness value by 1000, false leaves thickness value in SC3D units</param>
         public static void WriteThicknessResults(BaseFemPart baseFemPart, string fileName, bool sIUnits = true)
         {
-            string[] datasets = CreateThicknessDatasets(baseFemPart, sIUnits);
+            string[][] datasets = CreateThicknessDatasets(baseFemPart, sIUnits);
             fileName = CreateFullPath(fileName);
 
-            // concatenate all datasets
-            string unvFile = datasets[0] + Environment.NewLine + datasets[1];
+            theUFSession.Ui.SetStatus("Writing universal file");
+            using(StreamWriter writetext = new StreamWriter(fileName))
+            {
+                for (int i = 0; i < datasets.Length; i++)
+                {
+                    for (int j = 0; j < datasets[i].Length; j++)
+                    {
+                        writetext.Write(datasets[i][j]);
+                    }
 
-            File.WriteAllText(fileName, unvFile);
+                    writetext.Write(Environment.NewLine);
+                }
+            }
         }
 
-        public static string[] CreateThicknessDatasets(BaseFemPart baseFemPart, bool sIUnits)
+        /// <summary>
+        /// This method generates the universal file thickness datasets as both elemental and 
+        /// element-nodal result. SI units can be specified.
+        /// </summary>
+        /// <param name="baseFemPart">The BaseFemPart to generate the thickness result for.</param>
+        /// <param name="sIUnits">True divides thickness value by 1000, false leaves thickness value in SC3D units</param>
+        public static string[][] CreateThicknessDatasets(BaseFemPart baseFemPart, bool sIUnits)
         {
             theLW.WriteFullline("---------- WARNING ----------");
             theLW.WriteFullline("The Element-Nodal result Record 14 field 2 is set to 2: ");
@@ -115,38 +127,44 @@ namespace TheScriptingEngineer
             theLW.WriteFullline("When using externally, update Record 14 field 2 to 1!");
             theLW.WriteFullline("-------- END WARNING ---------");
 
-            string thicknessDatasetElemental = CreateThicknessHeader(1, "Thickness", "Elemental");
-            string thicknessDatasetElementNodal = CreateThicknessHeader(1, "Thickness", "Element-Nodal"); // by providing the same label, both results will get grouped under the loadcase thickness
-
             SortedList<int, FEElement> allElements = GetAllFEElements(baseFemPart);
-            foreach (KeyValuePair<int, FEElement> item in allElements)
+
+            string[] thicknessDatasetElemental = new string[allElements.Count + 2];
+            string[] thicknessDatasetElementNodal = new string[allElements.Count + 2];
+            thicknessDatasetElemental[0] = CreateThicknessHeader(1, "Thickness", "Elemental");
+            thicknessDatasetElementNodal[0] = CreateThicknessHeader(1, "Thickness", "Element-Nodal"); // by providing the same label, both results will get grouped under the loadcase thickness
+
+            //  foreach (KeyValuePair<int, FEElement> item in allElements)
+            for (int i = 0; i < allElements.Count; i++)
             {
-                if (item.Value.Shape.ToString() == "Quad" || item.Value.Shape.ToString() == "Tri")
+                if (allElements.Values[i].Shape.ToString() == "Quad" || allElements.Values[i].Shape.ToString() == "Tri")
                 {
-                    thicknessDatasetElemental = thicknessDatasetElemental + CreateThicknessRecords(baseFemPart, item.Value, sIUnits)[0];
-                    thicknessDatasetElementNodal = thicknessDatasetElementNodal + CreateThicknessRecords(baseFemPart, item.Value, sIUnits)[1];
+                    thicknessDatasetElemental[i + 1] = CreateThicknessRecords(allElements.Values[i], sIUnits)[0];
+                    thicknessDatasetElementNodal[i + 1] = CreateThicknessRecords(allElements.Values[i], sIUnits)[1];
                 }
             }
 
-            thicknessDatasetElemental = thicknessDatasetElemental + String.Format("{0, 6}", "-1");
-            thicknessDatasetElementNodal = thicknessDatasetElementNodal + String.Format("{0, 6}", "-1");
+            thicknessDatasetElemental[thicknessDatasetElemental.Length - 1] = String.Format("{0, 6}", "-1");
+            thicknessDatasetElementNodal[thicknessDatasetElementNodal.Length - 1] = String.Format("{0, 6}", "-1");
 
-            string[] thicknessDataSets = { thicknessDatasetElemental, thicknessDatasetElementNodal };
+            string[][] thicknessDataSets = { thicknessDatasetElemental, thicknessDatasetElementNodal };
             return thicknessDataSets;
         }
 
         /// <summary>
         /// This function generates result records where the result is a shell element thickness.
         /// </summary>
-        /// <param name="baseFemPart">The BaseFemPart to generate the thickness datasets for.</param>
-        /// <param name="fEElement">The FEElement for which to generate to thickness records for.</param>
+        /// <param name="fEElement">The FEElement to generate the thickness datasets for.</param>
+        /// <param name="sIUnits">True divides thickness value by 1000, false leaves thickness value in SC3D units</param>
         /// <returns>An array with the elemental and element-nodal record for the given FEElement.</returns>
-        public static string[] CreateThicknessRecords(BaseFemPart baseFemPart, FEElement fEElement, bool sIUnits)
+        public static string[] CreateThicknessRecords(FEElement fEElement, bool sIUnits)
         {
+            // passing elementAssociatedDataUtils object for performance, so it does not need be be created for each element.
+            
             // user feedback, but not for all, otherwise some performance hit.
             if (fEElement.Label % 1000 == 0)
             {
-                theUFSession.Ui.SetStatus("Generating records for element " + fEElement.Label.ToString()); 
+                theUFSession.Ui.SetStatus("Generating records for element " + fEElement.Label.ToString());
             }
             
             double thickness = -1;
@@ -162,54 +180,8 @@ namespace TheScriptingEngineer
             // some versions of (NX12) will even give a "result file in wrong format" error. In this case, simply change the value to 2
             string Record14ElementNodal = String.Format("{0, 10}", fEElement.Label) + String.Format("{0, 10}", "2") +  String.Format("{0, 10}", fEElement.GetNodes().Length) + String.Format("{0, 10}", "1") + Environment.NewLine;
 
-            // Get the element nodal thickness form the element associated data (if defined)
-            ElementAssociatedDataUtils elementAssociatedDataUtils = baseFemPart.BaseFEModel.NodeElementMgr.ElemAssociatedDataUtils;
-            bool hasAssociatedDataDefined;
-            double[] cornerNodeThicknesses = new double[fEElement.GetNodes().Length];
-            double[] cornerNodeGapValues = new double[fEElement.GetNodes().Length];
-            double zOffset;
-            PhysicalPropertyTable physicalPropertyTable;
-            CaeElementAssociatedDataUtilsMatOrientationMethod matOriMethod;
-            CoordinateSystem coordinateSystem;
-            double matOriAngle;
-            CaeElementAssociatedDataUtilsCsysDataType caeElementAssociatedDataUtilsCsysDataType;
-            Point3d originPoint = new NXOpen.Point3d(0, 0, 0);
-            Point3d zAxisPoint = new NXOpen.Point3d(0, 0, 0);
-            Point3d planePoint = new NXOpen.Point3d(0, 0, 0);
-            int preferredLabel;
-            elementAssociatedDataUtils.AskShellData(fEElement, out hasAssociatedDataDefined, out cornerNodeThicknesses, out cornerNodeGapValues, out zOffset, out physicalPropertyTable, out matOriMethod, out coordinateSystem, out matOriAngle, out  caeElementAssociatedDataUtilsCsysDataType, originPoint, zAxisPoint, planePoint, out preferredLabel);
-            
             string Record15ElementNodal = "";
-            if (!hasAssociatedDataDefined)
-            {
-                // element has no associated data defined.
-                // cornerNodeThicknesses does not contain any data, so need to use element thickness for each node.
-                foreach (FENode item in fEElement.GetNodes())
-                {
-                    Record15ElementNodal = Record15ElementNodal + String.Format("{0, 13}", String.Format("{0:#.#####E+00}", thickness));
-                }
-            }
-            else
-            {
-                // element has associated data, however this doesn't necessarily mean for thickness, could easily be for example orientation.
-                // Somehow the NX developers have been creative again and provide -777777 as thickness if it has not been defined...
-                // therefore need to catch it!
-                foreach (Double item in cornerNodeThicknesses)
-                {
-                    if (item == -777777)
-                    {
-                        // no explicit associated thickness set for this node, so using elemental thickness.
-                        Record15ElementNodal = Record15ElementNodal + String.Format("{0, 13}", String.Format("{0:#.#####E+00}", thickness));
-                    }
-                    else
-                    {
-                        Double value = item;
-                        if (sIUnits) {value = item / 1000;}
-                        Record15ElementNodal = Record15ElementNodal + String.Format("{0, 13}", String.Format("{0:#.#####E+00}", value));
-                    }
-                    
-                }
-            }
+            Record15ElementNodal = Record15ElementNodal + String.Format("{0, 13}", String.Format("{0:#.#####E+00}", thickness));
 
             Record15ElementNodal = Record15ElementNodal + Environment.NewLine;
 
@@ -225,6 +197,7 @@ namespace TheScriptingEngineer
         /// <returns>An array of all FEElements in the baseFemPart.</returns>
         public static SortedList<int, FEElement> GetAllFEElements(BaseFemPart baseFemPart)
         {
+            theUFSession.Ui.SetStatus("Getting all element information from the SC3D database");
             SortedList<int, FEElement> allElements = new SortedList<int, FEElement>();
 
             FEElementLabelMap fEElementLabelMap = baseFemPart.BaseFEModel.FeelementLabelMap;
@@ -247,7 +220,6 @@ namespace TheScriptingEngineer
         /// <returns>The header as a string.</returns>
         public static string CreateThicknessHeader(int datasetLabel, string datasetName, string type)
         {
-            theUFSession.Ui.SetStatus("Creating thickness header");
             string header = "";
             header = header + String.Format("{0, 6}", "-1") + Environment.NewLine; // every dataset starts with -1
             header = header + String.Format("{0, 6}", "2414") + Environment.NewLine; // this is the header for dataset 2414
