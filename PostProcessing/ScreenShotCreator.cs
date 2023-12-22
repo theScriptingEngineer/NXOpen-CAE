@@ -75,7 +75,7 @@ namespace TheScriptingEngineerScreenShotCreator
         public static ListingWindow theLW = theSession.ListingWindow;
         public static string nXVersion = theSession.GetEnvironmentVariableValue("UGII_VERSION"); // theSession.BuildNumber only available from version 1926 onwards
 
-        public static void Main(string[] args)
+        public static void Main()
         {
             theLW.Open();
 
@@ -86,12 +86,12 @@ namespace TheScriptingEngineerScreenShotCreator
                 return;
             }
 
-            string filePath = "";
-
+            string[] filePaths;
             // https://docs.microsoft.com/en-us/dotnet/api/system.windows.forms.openfiledialog?view=netframework-4.8
             using (System.Windows.Forms.OpenFileDialog openFileDialog = new OpenFileDialog())
             {
                 openFileDialog.Filter = "csv files (*.csv)|*.csv";
+                openFileDialog.Multiselect = true;
                 DialogResult openFileDialogResult = openFileDialog.ShowDialog();
 
                 if (openFileDialogResult == DialogResult.Cancel)
@@ -100,9 +100,17 @@ namespace TheScriptingEngineerScreenShotCreator
                     return;
                 }
 
-                filePath = openFileDialog.FileName;
+                filePaths = openFileDialog.FileNames;
             }
 
+            foreach (string path in filePaths)
+            {
+                CreateScreenshotsFromFile(path);
+            }
+        }
+
+        public static void CreateScreenshotsFromFile(string filePath)
+        {
             // read the input file into an array of ScreenShot
             // it's user input, so errors can occur
             ScreenShot[] screenShots = null;
@@ -364,6 +372,7 @@ namespace TheScriptingEngineerScreenShotCreator
         /// <returns>The ID of the post view created for the result.</returns>
         public static void ChangeComponent(int postViewId, string componentName)
         {
+            // theLW.WriteFullline(componentName);
             Result.Component component = (Result.Component)Enum.Parse(typeof(Result.Component), componentName);
             Result result;
             ResultParameters resultParameters;
