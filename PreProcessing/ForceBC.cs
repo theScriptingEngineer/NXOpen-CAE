@@ -263,5 +263,92 @@
 
             return simBC;
         }
+
+
+        /// <summary>
+        /// Create a nodal moment on a node with givel label, using the given moment components and name.
+        /// </summary>
+        /// <param name="nodeLabel">The array of ResultType used in the envelope</param>
+        /// <param name="mx">X component of the moment in NewtonMeter and global X direction</param>
+        /// <param name="my">Y component of the moment in NewtonMeter and global y direction</param>
+        /// <param name="mz">Z component of the moment in NewtonMeter and global Z direction</param>
+        /// <param name="momentName">Name of the nodal force.</param>
+        /// <returns>Returns the created force object.</returns>
+        public static SimBC CreateNodalMoment(int nodeLabel, double mx, double my, double mz, string momentName)
+        {         
+            if (basePart as SimPart == null)
+            {
+                // caePart is not a SimPart
+                theLW.WriteFullline("This program needs to start from a .sim file. Exiting");
+                return null;
+            }
+            SimPart simPart = (SimPart)basePart;
+            SimSimulation simSimulation = simPart.Simulation;
+
+            // set solution to inactive so load is not automatically added upon creation
+            simPart.Simulation.ActiveSolution = null;
+
+            // Check if load already exists
+            SimBCBuilder simBCBuilder;
+            SimLoad[] simLoads = simPart.Simulation.Loads.ToArray();
+            SimLoad simLoad = Array.Find(simLoads, load => load.Name.ToLower() == momentName.ToLower());
+            if (simLoad == null)
+            {
+                // no load with the given name, thus creating the load
+                simBCBuilder = simSimulation.CreateBcBuilderForLoadDescriptor("ComponentMomentField", momentName);
+            }
+            else
+            {
+                // a load with the given name already exists therefore editing the load
+                simBCBuilder = simSimulation.CreateBcBuilderForBc(simLoad);
+            }
+
+            PropertyTable propertyTable = simBCBuilder.PropertyTable;
+            SetManager setManager = simBCBuilder.TargetSetManager;
+
+            FENode fENode = simPart.Simulation.Femodel.FenodeLabelMap.GetNode(nodeLabel);
+            if (fENode == null)
+            {
+                theLW.WriteFullline("No node with label " + nodeLabel + " found in the model! Force not created");
+                return null;
+            }
+            SetObject[] objects = new SetObject[1];
+            objects[0].Obj = fENode;
+            objects[0].SubType = CaeSetObjectSubType.None;
+            objects[0].SubId = 0;
+            setManager.SetTargetSetMembers(0, CaeSetGroupFilterType.Node, objects);
+            
+            NXOpen.Fields.VectorFieldWrapper vectorFieldWrapper1 = propertyTable.GetVectorFieldWrapperPropertyValue("CartesianMagnitude");
+            
+            Unit unit1 = (NXOpen.Unit)simPart.UnitCollection.FindObject("NewtonMeter");
+            Expression expression1 = simPart.Expressions.CreateSystemExpressionWithUnits(mx.ToString(), unit1);
+            Expression expression2 = simPart.Expressions.CreateSystemExpressionWithUnits(my.ToString(), unit1);
+            Expression expression3 = simPart.Expressions.CreateSystemExpressionWithUnits(mz.ToString(), unit1);
+            
+            NXOpen.Fields.FieldManager fieldManager1 = (NXOpen.Fields.FieldManager)simPart.FindObject("FieldManager");
+            Expression[] expressions1 = new Expression[3];
+            expressions1[0] = expression1;
+            expressions1[1] = expression2;
+            expressions1[2] = expression3;
+            NXOpen.Fields.VectorFieldWrapper vectorFieldWrapper = fieldManager1.CreateVectorFieldWrapperWithExpressions(expressions1);
+            
+            propertyTable.SetVectorFieldWrapperPropertyValue("CartesianMagnitude", vectorFieldWrapper);
+            propertyTable.SetTablePropertyWithoutValue("CylindricalMagnitude");
+            NXOpen.Fields.VectorFieldWrapper nullNXOpen_Fields_VectorFieldWrapper = null;
+            propertyTable.SetVectorFieldWrapperPropertyValue("CylindricalMagnitude", nullNXOpen_Fields_VectorFieldWrapper);
+            propertyTable.SetTablePropertyWithoutValue("SphericalMagnitude");
+            propertyTable.SetVectorFieldWrapperPropertyValue("SphericalMagnitude", nullNXOpen_Fields_VectorFieldWrapper);
+            propertyTable.SetTablePropertyWithoutValue("DistributionField");
+            NXOpen.Fields.ScalarFieldWrapper nullNXOpen_Fields_ScalarFieldWrapper = null;
+            propertyTable.SetScalarFieldWrapperPropertyValue("DistributionField", nullNXOpen_Fields_ScalarFieldWrapper);
+            propertyTable.SetTablePropertyWithoutValue("ComponentsDistributionField");
+            propertyTable.SetVectorFieldWrapperPropertyValue("ComponentsDistributionField", nullNXOpen_Fields_VectorFieldWrapper);
+            
+            SimBC simBC = simBCBuilder.CommitAddBc();
+            
+            simBCBuilder.Destroy();
+
+            return simBC;
+        }
     }
 }
