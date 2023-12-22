@@ -32,30 +32,10 @@ namespace TheScriptingEngineer
             theLW.Open();
             theLW.WriteFullline("Starting Main() in " + theSession.ExecutingJournal);
 
-            BaseFemPart baseFemPart;
-            if (basePart as SimPart != null)
-            {
-                theLW.WriteFullline("Starting from sim file.");
-                SimPart simPart = (SimPart)basePart;
-                baseFemPart = (BaseFemPart)simPart.FemPart;
-
-                // if the baseFemPart is an AssyFemPart then need to make it work for the code to run.
-                theSession.Parts.SetWork(baseFemPart);
-            }
-            else if (basePart as BaseFemPart != null)
-            {
-                theLW.WriteFullline("Starting from fem or afem file.");
-                baseFemPart = (BaseFemPart)basePart;
-            }
-            else
-            {
-                theLW.WriteFullline("This function needs to start from a .sim, .afem or .fem.");
-                return;
-            }
-
             bool sIUnits = false;
             if (!theSession.IsBatch)
             {
+                theUFSession.Ui.SetStatus("Please select units in pop-up window. Yes for SI Units, no for mm (assuming you work in metric units).");
                 string inputString = NXOpenUI.NXInputBox.GetInputString("Export in SI units? (yes or no)", "Please select units", "yes");
                 if (inputString == "")
                 {
@@ -76,7 +56,28 @@ namespace TheScriptingEngineer
                     theUI.NXMessageBox.Show("Export shell thickness as universal file", NXMessageBox.DialogType.Error, "Please type yes or no");
                     return;
                 }
+            }
 
+            BaseFemPart baseFemPart;
+            if (basePart as SimPart != null)
+            {
+                theUFSession.Ui.SetStatus("Starting from sim file, switching to (a)fem part.");
+                theLW.WriteFullline("Starting from sim file.");
+                SimPart simPart = (SimPart)basePart;
+                baseFemPart = (BaseFemPart)simPart.FemPart;
+
+                // if the baseFemPart is an AssyFemPart then need to make it work for the code to run.
+                theSession.Parts.SetWork(baseFemPart);
+            }
+            else if (basePart as BaseFemPart != null)
+            {
+                theLW.WriteFullline("Starting from fem or afem file.");
+                baseFemPart = (BaseFemPart)basePart;
+            }
+            else
+            {
+                theLW.WriteFullline("This function needs to start from a .sim, .afem or .fem.");
+                return;
             }
 
             WriteThicknessResults(baseFemPart, "Thickness.unv", sIUnits);
