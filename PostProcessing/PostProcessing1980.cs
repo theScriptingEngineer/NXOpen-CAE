@@ -875,6 +875,45 @@
 
             return resultUnits;
         }
+
+        public static double[] GetElementalValue(string solutionName, int subcase, int iteration, string resultType, int elementLabel, NXOpen.CAE.ResultParameters resultParameters = null)
+        {
+            PostInput postInput = new PostInput(solutionName, subcase, iteration, resultType);
+            PostInput[] postInputs = new PostInput[] { postInput };
+
+            try
+            {
+                CheckPostInput(postInputs);
+            }
+            catch (ArgumentException e)
+            {
+                theLW.WriteFullline("Did not execute ExportResult due to input error. Please check the previous messages.");
+                theLW.WriteFullline(e.Message);
+                return null;
+            }
+            catch (Exception e)
+            {
+                theLW.WriteFullline("Did not execute ExportResult due to general error. Please check the previous messages.");
+                theLW.WriteFullline(e.Message);
+                return null;
+            }
+
+            NXOpen.CAE.SolutionResult[] solutionResults = LoadResults(postInputs);
+            NXOpen.CAE.Result result = (NXOpen.CAE.Result)solutionResults[0];
+            NXOpen.CAE.ResultType[] resultTypes = GetResultTypes(postInputs, solutionResults);
+
+            if (resultParameters == null)
+            {
+                resultParameters = GetResultParamaters(resultTypes, NXOpen.CAE.Result.ShellSection.Maximum, NXOpen.CAE.Result.Component.Xx, false)[0];
+            }
+
+            NXOpen.CAE.ResultAccess resultAccess = theSession.ResultManager.CreateResultAccess(result, resultParameters);
+            double[] elementalData;
+            resultAccess.AskElementResultAllComponents(solutionResults[0].AskElementIndex(elementLabel), out elementalData);
+
+            return elementalData;
+        }
+
     }
 
     /// <summary>

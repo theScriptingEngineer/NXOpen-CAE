@@ -169,7 +169,15 @@ namespace TheScriptingEngineer
                     RelatedNodeMethod relatedNodeMethodMesh = smartSelectionManager.CreateNewRelatedNodeMethodFromMesh(seedsMesh, false, false);
                     foreach (FENode node in relatedNodeMethodMesh.GetNodes())
                     {
-                        allNodes.Add(node.Label, node);
+                        // meshes share nodes. cannot add the same node twice
+                        try
+                        {
+                            allNodes.Add(node.Label, node);
+                        }
+                        catch (System.Exception)
+                        {
+                            continue;
+                        }
                     }
                 }
             }
