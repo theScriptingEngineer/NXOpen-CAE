@@ -40,7 +40,8 @@
         /// This implicilty assumes that physical properties are created with ascending labels.
         /// </summary>
         /// <param name="thickness">The thickness of the 2d mesh.</param>
-        public static void CreateMeshCollector(double thickness)
+        /// <param name="color">OPTIONAL: The color of the 2d mesh collector (meshes will inherit this color).</param>
+        public static void CreateMeshCollector(double thickness, int color = -1)
         {
             FemPart femPart = (FemPart)theSession.Parts.BaseWork;
             
@@ -93,7 +94,15 @@
             meshCollectorDisplayDefaults1 = meshCollector.GetMeshDisplayDefaults();
             
             // we set the color as label * 10 to make a distinction between the colors. The maximum color number is 216, therefore we take the modulus to not exceed this numer (eg. 15%4 -> 3)
-            meshCollectorDisplayDefaults1.Color = NXColor.Factory._Get((maxLabel * 10) % 216); //workFemPart.Colors.Find("Smoke Gray");
+            if (color == -1)
+            {
+                meshCollectorDisplayDefaults1.Color = NXColor.Factory._Get((maxLabel * 10) % 216); //workFemPart.Colors.Find("Smoke Gray");
+            }
+            else
+            {
+                meshCollectorDisplayDefaults1.Color = NXColor.Factory._Get(color);
+            }
+            
             
             meshCollectorDisplayDefaults1.Dispose();
         }
