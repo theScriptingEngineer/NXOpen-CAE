@@ -180,7 +180,13 @@
             NXOpen.Expression expressionWidth = femPart.Expressions.CreateSystemExpressionWithUnits(recipeSize.ToString(), unitMilliMeter);
             NXOpen.Expression expressionHeight = femPart.Expressions.CreateSystemExpressionWithUnits(recipeThickness.ToString(), unitMilliMeter);
 
-            SelectionRecipe selectionRecipe = femPart.SelectionRecipes.CreateBoxBoundingVolumeRecipe(datumPlane.Feature.Name, recipeCoordinateSystem, expressionLength, expressionWidth, expressionHeight, entitytypes);
+            // SelectionRecipe selectionRecipe = femPart.SelectionRecipes.CreateBoxBoundingVolumeRecipe(datumPlane.Feature.Name, recipeCoordinateSystem, expressionLength, expressionWidth, expressionHeight, entitytypes);
+            // Previous line is for pre NX1847, below is for NX1847 and later
+            NXOpen.CAE.SelRecipeBuilder selRecipeBuilder = femPart.SelectionRecipes.CreateSelRecipeBuilder();
+            selRecipeBuilder.AddBoxBoundingVolumeStrategy(recipeCoordinateSystem, expressionLength, expressionWidth, expressionHeight, entitytypes, NXOpen.CAE.SelRecipeBuilder.InputFilterType.EntireModel, null);
+            selRecipeBuilder.RecipeName = datumPlane.Feature.Name;
+            SelectionRecipe selectionRecipe = (SelectionRecipe)selRecipeBuilder.Commit();
+            selRecipeBuilder.Destroy();
 
             return selectionRecipe;
         }
